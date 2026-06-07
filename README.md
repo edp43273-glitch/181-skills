@@ -18,6 +18,8 @@
 ![Java](https://img.shields.io/badge/-Java-ED8B00?logo=openjdk&logoColor=white)
 ![Perl](https://img.shields.io/badge/-Perl-39457E?logo=perl&logoColor=white)
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?logo=markdown&logoColor=white)
+![Codex](https://img.shields.io/badge/Codex-CLI%20%2B%20App-111827)
+![Gemini CLI](https://img.shields.io/badge/Gemini-CLI%20Extension-4285F4)
 
 > **182K+ stars** | **28K+ forks** | **170+ contributors** | **12+ language ecosystems** | **Cross-harness agent workflows**
 
@@ -39,6 +41,25 @@
 Not just configs. A complete system: skills, instincts, memory optimization, continuous learning, security scanning, and research-first development. Production-ready agents, skills, hooks, rules, MCP configurations, and legacy command shims evolved over 10+ months of intensive daily use building real products.
 
 Works across **Codex**, **Claude Code**, **Cursor**, **OpenCode**, **Gemini**, **Zed**, **GitHub Copilot**, and other AI agent harnesses.
+
+### New: Codex + Gemini Native Surfaces
+
+ECC now ships first-class surfaces for **Codex**, **Codex CLI**, **Codex app**, **Gemini**, and **Gemini CLI**. These are not README-only claims: the branch includes generated, installable directories for both harness families.
+
+| Harness | What ECC Adds | Install Surface |
+|---------|---------------|-----------------|
+| **Codex CLI** | `251` packaged skills, `63` agents, `79` command prompts, MCP config, and plugin metadata | `plugins/ecc/` via `codex plugin add ecc@ecc` |
+| **Codex app** | The same plugin package plus project-local `.codex/` config and sample agent roles | Open the repo or install the local Codex plugin package |
+| **Gemini CLI** | Project context, `251` skills, `63` Gemini-compatible agents, and `79` TOML custom commands | `.gemini/` plus `extensions/ecc-gemini/` |
+| **Gemini extension** | A self-contained extension package with `GEMINI.md`, skills, agents, and commands | `gemini extensions link ./extensions/ecc-gemini` |
+
+```bash
+# Build the Codex plugin package
+npm run codex:package
+
+# Build the Gemini workspace + extension surfaces
+npm run gemini:surface
+```
 
 ECC v2.0.0-rc.1 adds the public Hermes operator story on top of that reusable layer: start with the [Hermes setup guide](docs/HERMES-SETUP.md), then review the [rc.1 release notes](docs/releases/2.0.0-rc.1/release-notes.md) and [cross-harness architecture](docs/architecture/cross-harness.md).
 
@@ -1147,7 +1168,7 @@ Each component is fully independent.
 
 Yes. ECC is cross-platform:
 - **Cursor**: Pre-translated configs in `.cursor/`. See [Cursor IDE Support](#cursor-ide-support).
-- **Gemini CLI**: Experimental project-local support via `.gemini/GEMINI.md` and shared installer plumbing.
+- **Gemini CLI**: Project-local support via `.gemini/` plus a local extension package at `extensions/ecc-gemini/`.
 - **OpenCode**: Full plugin support in `.opencode/`. See [OpenCode Support](#opencode-support).
 - **Codex**: First-class support for both macOS app and CLI, with adapter drift guards and SessionStart fallback. See PR [#257](https://github.com/affaan-m/ECC/pull/257).
 - **GitHub Copilot (VS Code)**: Instruction and prompt layer via `.github/copilot-instructions.md`, `.vscode/settings.json`, and `.github/prompts/`. See [GitHub Copilot Support](#github-copilot-support).
@@ -1283,15 +1304,24 @@ alwaysApply: false
 
 ---
 
-## Codex macOS App + CLI Support
+## Codex App + CLI Support
 
-ECC provides **first-class Codex support** for both the macOS app and CLI, with a reference configuration, Codex-specific AGENTS.md supplement, and shared skills.
+ECC provides **first-class Codex support** for both Codex CLI and the Codex app. The Codex surface is materialized as an installable plugin package, backed by project-local configuration, a Codex-specific AGENTS.md supplement, sample agent roles, shared skills, command prompts, and MCP settings.
 
 ### Quick Start (Codex App + CLI)
 
 ```bash
 # Run Codex CLI in the repo — AGENTS.md and .codex/ are auto-detected
 codex
+
+# Install ECC as a Codex plugin from a local checkout
+npm run codex:package
+codex plugin marketplace add /absolute/path/to/ECC
+codex plugin add ecc@ecc
+
+# Or add the public repo marketplace after this branch lands upstream
+codex plugin marketplace add affaan-m/ECC
+codex plugin add ecc@ecc
 
 # Automatic setup: sync ECC assets (AGENTS.md, skills, MCP servers) into ~/.codex
 npm install && bash scripts/sync-ecc-to-codex.sh
@@ -1304,6 +1334,12 @@ cp .codex/config.toml ~/.codex/config.toml
 ```
 
 The sync script safely merges ECC MCP servers into your existing `~/.codex/config.toml` using an **add-only** strategy — it never removes or modifies your existing servers. Run with `--dry-run` to preview changes, or `--update-mcp` to force-refresh ECC servers to the latest recommended config.
+
+Codex plugin marketplace support uses the generated `plugins/ecc/` package. That
+package is rebuilt from root `skills/`, `agents/`, `commands/`, `.mcp.json`, and
+`.codex-plugin/` by `npm run codex:package`; do not edit the generated package
+by hand. This keeps Codex CLI and Codex app installs aligned with the canonical
+ECC catalog.
 
 For Context7, ECC uses the canonical Codex section name `[mcp_servers.context7]` while still launching the `@upstash/context7-mcp` package. If you already have a legacy `[mcp_servers.context7-mcp]` entry, `--update-mcp` migrates it to the canonical section name.
 
@@ -1319,15 +1355,20 @@ Codex macOS app:
 | Component | Count | Details |
 |-----------|-------|---------|
 | Config | 1 | `.codex/config.toml` — top-level approvals/sandbox/web_search, MCP servers, notifications, profiles |
-| AGENTS.md | 2 | Root (universal) + `.codex/AGENTS.md` (Codex-specific supplement) |
-| Skills | 32 | `.agents/skills/` — SKILL.md + agents/openai.yaml per skill |
+| Plugin package | 1 | `plugins/ecc/` — materialized Codex plugin root for CLI/app install |
+| AGENTS.md | 2 | Root (universal) + `.codex/AGENTS.md` (merged by sync script as Codex-specific supplement) |
+| Skills | 251 | `plugins/ecc/skills/` — SKILL.md per skill |
+| Agents | 63 | `plugins/ecc/agents/` plus project roles in `.codex/agents/` |
+| Commands | 79 | `plugins/ecc/commands/` — command prompt shims for Codex-compatible command surfaces |
 | MCP Servers | 6 | GitHub, Context7, Exa, Memory, Playwright, Sequential Thinking (7 with Supabase via `--update-mcp` sync) |
 | Profiles | 2 | `strict` (read-only sandbox) and `yolo` (full auto-approve) |
 | Agent Roles | 3 | `.codex/agents/` — explorer, reviewer, docs-researcher |
 
 ### Skills
 
-Skills at `.agents/skills/` are auto-loaded by Codex:
+Installed Codex plugin skills are packaged under `plugins/ecc/skills/`. Workspace
+skills under `.agents/skills/` remain available for repo-local development and
+cross-harness compatibility.
 
 Canonical Anthropic skills such as `claude-api`, `frontend-design`, and `skill-creator` are intentionally not re-bundled here. Install those from [`anthropics/skills`](https://github.com/anthropics/skills) when you want the official versions.
 
@@ -1386,6 +1427,44 @@ ECC ships three sample role configs:
 | `explorer` | Read-only codebase evidence gathering before edits |
 | `reviewer` | Correctness, security, and missing-test review |
 | `docs_researcher` | Documentation and API verification before release/docs changes |
+
+---
+
+## Gemini CLI Support
+
+ECC provides both a project-local Gemini surface and a Gemini extension package.
+Gemini CLI calls this an **extension**, not a plugin. The generated Gemini
+surface adapts ECC agents, skills, and commands into the formats Gemini CLI
+expects: `.gemini/agents/*.md`, `.gemini/skills/*/SKILL.md`, and TOML custom
+commands under `.gemini/commands/`.
+
+```bash
+# Rebuild Gemini project and extension surfaces
+npm run gemini:surface
+
+# Project-local use: open the repository with Gemini CLI
+gemini
+
+# Extension use while developing locally
+gemini extensions link ./extensions/ecc-gemini
+
+# Non-interactive local linking when you have already reviewed the extension
+gemini extensions link ./extensions/ecc-gemini --consent
+```
+
+### What's Included for Gemini
+
+| Component | Count | Details |
+|-----------|-------|---------|
+| Context | 1 | `.gemini/GEMINI.md` — Gemini context file that imports root `AGENTS.md` |
+| Extension | 1 | `extensions/ecc-gemini/gemini-extension.json` |
+| Skills | 251 | `.gemini/skills/` and `extensions/ecc-gemini/skills/` |
+| Agents | 63 | `.gemini/agents/` and `extensions/ecc-gemini/agents/` with Gemini tool names |
+| Commands | 79 | `.gemini/commands/` and `extensions/ecc-gemini/commands/` as TOML custom commands |
+
+Gemini CLI must be installed separately. If it is installed, use `/skills list`,
+`/agents list`, and `/commands list` inside Gemini CLI to inspect the loaded ECC
+surface.
 
 ---
 
@@ -1585,26 +1664,26 @@ GitHub Copilot does not have a hook system or a subagent API, so ECC's hook auto
 
 ECC is the **first plugin to maximize every major AI coding tool**. Here's how each harness compares:
 
-| Feature | Claude Code           | Cursor IDE | Codex CLI | OpenCode | GitHub Copilot |
-|---------|-----------------------|------------|-----------|----------|----------------|
-| **Agents** | 63                    | Shared (AGENTS.md) | Shared (AGENTS.md) | 12 | N/A |
-| **Commands** | 79                    | Shared | Instruction-based | 35 | 6 prompts |
-| **Skills** | 251                   | Shared | 10 (native format) | 37 | Via instructions |
-| **Hook Events** | 8 types               | 15 types | None yet | 11 types | None |
-| **Hook Scripts** | 20+ scripts           | 16 scripts (DRY adapter) | N/A | Plugin hooks | N/A |
-| **Rules** | 34 (common + lang)    | 34 (YAML frontmatter) | Instruction-based | 13 instructions | 1 always-on file |
-| **Custom Tools** | Via hooks             | Via hooks | N/A | 6 native tools | N/A |
-| **MCP Servers** | 14                    | Shared (mcp.json) | 7 (auto-merged via TOML parser) | Full | N/A |
-| **Config Format** | settings.json         | hooks.json + rules/ | config.toml | opencode.json | copilot-instructions.md + settings.json |
-| **Context File** | CLAUDE.md + AGENTS.md | AGENTS.md | AGENTS.md | AGENTS.md | copilot-instructions.md |
-| **Secret Detection** | Hook-based            | beforeSubmitPrompt hook | Sandbox-based | Hook-based | Instruction-based |
-| **Auto-Format** | PostToolUse hook      | afterFileEdit hook | N/A | file.edited hook | N/A |
-| **Version** | Plugin | Plugin | Reference config | 2.0.0-rc.1 | Instruction layer |
+| Feature | Claude Code | Cursor IDE | Codex CLI/App | Gemini CLI | OpenCode | GitHub Copilot |
+|---------|-------------|------------|----------------|------------|----------|----------------|
+| **Agents** | 63 | Shared (AGENTS.md) | 63 packaged + 3 project roles | 63 generated local/extension agents | 12 | N/A |
+| **Commands** | 79 | Shared | 79 packaged prompts | 79 TOML custom commands | 35 | 6 prompts |
+| **Skills** | 251 | Shared | 251 packaged skills | 251 workspace/extension skills | 37 | Via instructions |
+| **Hook Events** | 8 types | 15 types | None yet | Extension hooks supported by Gemini CLI, not wired by ECC by default | 11 types | None |
+| **Hook Scripts** | 20+ scripts | 16 scripts (DRY adapter) | N/A | N/A by default | Plugin hooks | N/A |
+| **Rules** | 34 (common + lang) | 34 (YAML frontmatter) | Instruction-based | GEMINI.md + skill/agent guidance | 13 instructions | 1 always-on file |
+| **Custom Tools** | Via hooks | Via hooks | N/A | Extension MCP/tools supported; ECC extension currently focuses on context, skills, agents, commands | 6 native tools | N/A |
+| **MCP Servers** | 14 | Shared (mcp.json) | 6 packaged + 7 via sync with Supabase | Shared catalog/manual config | Full | N/A |
+| **Config Format** | settings.json | hooks.json + rules/ | config.toml + plugin package | GEMINI.md + gemini-extension.json | opencode.json | copilot-instructions.md + settings.json |
+| **Context File** | CLAUDE.md + AGENTS.md | AGENTS.md | AGENTS.md | GEMINI.md | AGENTS.md | copilot-instructions.md |
+| **Secret Detection** | Hook-based | beforeSubmitPrompt hook | Sandbox-based | Policy/instruction-based unless extension hooks are enabled | Hook-based | Instruction-based |
+| **Auto-Format** | PostToolUse hook | afterFileEdit hook | N/A | N/A by default | file.edited hook | N/A |
+| **Version** | Plugin | Plugin | 2.0.0-rc.1 | 2.0.0-rc.1 | 2.0.0-rc.1 | Instruction layer |
 
 **Key architectural decisions:**
-- **AGENTS.md** at root is the universal cross-tool file (read by Claude Code, Cursor, Codex, and OpenCode — GitHub Copilot uses `.github/copilot-instructions.md` instead)
+- **AGENTS.md** at root is the universal cross-tool file (read by Claude Code, Cursor, Codex, and OpenCode; Gemini imports it from `.gemini/GEMINI.md`; GitHub Copilot uses `.github/copilot-instructions.md` instead)
 - **DRY adapter pattern** lets Cursor reuse Claude Code's hook scripts without duplication
-- **Skills format** (SKILL.md with YAML frontmatter) works across Claude Code, Codex, and OpenCode
+- **Skills format** (SKILL.md with YAML frontmatter) works across Claude Code, Codex, Gemini, and OpenCode
 - Codex's lack of hooks is compensated by `AGENTS.md`, optional `model_instructions_file` overrides, and sandbox permissions
 
 ---
