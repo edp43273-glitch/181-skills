@@ -9,31 +9,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/SplitText.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:            oklch(7%  0.022 355);
-      --surface:       oklch(11% 0.028 355);
-      --surface-hi:    oklch(16% 0.032 355);
-      --ruby:          oklch(48% 0.24  18);
-      --ruby-mid:      oklch(55% 0.22  18);
-      --ruby-light:    oklch(65% 0.20  18);
-      --gold:          oklch(74% 0.14  72);
-      --gold-light:    oklch(84% 0.12  72);
-      --cream:         oklch(96% 0.01  60);
-      --muted:         oklch(60% 0.05 355);
-      --border:        oklch(22% 0.04 355);
-      --font-display:  'Playfair Display', Georgia, serif;
-      --font-elegant:  'Cormorant Garamond', Georgia, serif;
-      --font-body:     'DM Sans', system-ui, sans-serif;
-      --ease-expo:     cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-back:     cubic-bezier(0.34, 1.56, 0.64, 1);
+      --bg:         oklch(7%  0.022 355);
+      --surface:    oklch(11% 0.028 355);
+      --surface-hi: oklch(16% 0.032 355);
+      --ruby:       oklch(52% 0.28  18);
+      --ruby-mid:   oklch(60% 0.26  18);
+      --ruby-light: oklch(72% 0.22  18);
+      --gold:       oklch(78% 0.17  72);
+      --gold-light: oklch(88% 0.14  72);
+      --pink:       oklch(68% 0.30 345);
+      --purple:     oklch(55% 0.26 300);
+      --coral:      oklch(68% 0.24  35);
+      --cream:      oklch(96% 0.01  60);
+      --muted:      oklch(60% 0.05 355);
+      --border:     oklch(22% 0.04 355);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-elegant: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'DM Sans', system-ui, sans-serif;
+      --ease-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-back:  cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-spring:cubic-bezier(0.175, 0.885, 0.32, 1.4);
     }
 
     html { scroll-behavior: smooth; }
-
     body {
       background: var(--bg);
       color: var(--cream);
@@ -44,1222 +46,1713 @@
       cursor: none;
     }
 
-    /* ── CUSTOM CURSOR ── */
+    /* ── CURSOR ── */
     #cursor {
       position: fixed; top: 0; left: 0; z-index: 9999;
       pointer-events: none; mix-blend-mode: difference;
     }
     #cursor-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--gold); transform: translate(-50%, -50%);
-      transition: transform 0.1s var(--ease-expo);
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s;
     }
     #cursor-ring {
-      position: fixed; top: 0; left: 0;
-      width: 40px; height: 40px; border-radius: 50%;
-      border: 1px solid oklch(84% 0.12 72 / 0.5);
+      width: 40px; height: 40px;
+      border: 1.5px solid var(--gold);
+      border-radius: 50%;
+      position: absolute;
       transform: translate(-50%, -50%);
-      pointer-events: none; z-index: 9998;
-      transition: width 0.3s var(--ease-expo), height 0.3s var(--ease-expo),
-                  border-color 0.3s, transform 0.08s linear;
+      opacity: 0.6;
+      transition: width 0.3s var(--ease-expo), height 0.3s var(--ease-expo), opacity 0.3s;
     }
-    #cursor-ring.hovering {
-      width: 64px; height: 64px;
-      border-color: var(--ruby-mid);
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring { width: 60px; height: 60px; opacity: 0.9; }
+
+    /* ── ANIMATED BLOB BACKGROUND ── */
+    .bg-blobs {
+      position: fixed; inset: 0; z-index: 0;
+      overflow: hidden; pointer-events: none;
     }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.35;
+      animation: blobMorph 12s ease-in-out infinite alternate;
+      will-change: transform, border-radius;
+    }
+    .blob-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, oklch(52% 0.28 18), transparent 70%);
+      top: -100px; left: -150px;
+      animation-delay: 0s; animation-duration: 14s;
+    }
+    .blob-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, oklch(78% 0.17 72), transparent 70%);
+      top: 30%; right: -100px;
+      animation-delay: -4s; animation-duration: 11s;
+    }
+    .blob-3 {
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, oklch(68% 0.30 345), transparent 70%);
+      bottom: 10%; left: 20%;
+      animation-delay: -7s; animation-duration: 16s;
+    }
+    .blob-4 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, oklch(55% 0.26 300), transparent 70%);
+      bottom: -50px; right: 15%;
+      animation-delay: -2s; animation-duration: 13s;
+    }
+    .blob-5 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, oklch(68% 0.24 35), transparent 70%);
+      top: 60%; left: 5%;
+      animation-delay: -9s; animation-duration: 10s;
+    }
+    @keyframes blobMorph {
+      0%   { transform: translate(0,0) scale(1);    border-radius: 60% 40% 70% 30% / 50% 60% 40% 70%; }
+      25%  { transform: translate(30px,-40px) scale(1.08); border-radius: 40% 60% 30% 70% / 60% 30% 70% 40%; }
+      50%  { transform: translate(-20px, 30px) scale(0.95); border-radius: 70% 30% 50% 50% / 30% 70% 30% 70%; }
+      75%  { transform: translate(40px, 10px) scale(1.05); border-radius: 30% 70% 70% 30% / 70% 40% 60% 30%; }
+      100% { transform: translate(-10px,-20px) scale(1.02); border-radius: 50% 50% 40% 60% / 60% 50% 50% 40%; }
+    }
+
+    /* ── CANVAS SPARKLES ── */
+    #sparkle-canvas {
+      position: fixed; inset: 0; z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── MAIN CONTENT ── */
+    main { position: relative; z-index: 2; }
 
     /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 1.5rem 4rem;
       display: flex; align-items: center; justify-content: space-between;
-      transition: background 0.4s, padding 0.4s;
-    }
-    nav.scrolled {
-      background: oklch(7% 0.022 355 / 0.92);
-      backdrop-filter: blur(20px);
-      padding: 1rem 4rem;
+      padding: 1.25rem 3rem;
+      backdrop-filter: blur(20px) saturate(1.4);
+      background: oklch(7% 0.022 355 / 0.7);
       border-bottom: 1px solid var(--border);
+      transition: padding 0.3s;
     }
+    nav.scrolled { padding: 0.75rem 3rem; }
     .nav-logo {
       font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.5rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--ruby-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
       letter-spacing: 0.05em;
-      color: var(--cream);
-      text-decoration: none;
     }
-    .nav-logo span { color: var(--ruby-mid); }
-    .nav-links {
-      display: flex; gap: 2.5rem; list-style: none;
-    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
     .nav-links a {
-      font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase;
       color: var(--muted); text-decoration: none;
-      transition: color 0.3s;
+      font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+      transition: color 0.25s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+      transform: scaleX(0); transform-origin: right;
+      transition: transform 0.3s var(--ease-expo);
     }
     .nav-links a:hover { color: var(--cream); }
+    .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
     .nav-cta {
-      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
-      padding: 0.6rem 1.6rem;
-      border: 1px solid var(--gold);
-      color: var(--gold); background: transparent;
-      text-decoration: none;
-      transition: background 0.3s, color 0.3s;
+      padding: 0.55rem 1.5rem;
+      background: var(--ruby); color: var(--cream);
+      border: none; border-radius: 2rem; font-size: 0.82rem;
+      letter-spacing: 0.1em; text-transform: uppercase; cursor: none;
+      transition: background 0.3s, transform 0.2s;
     }
-    .nav-cta:hover { background: var(--gold); color: var(--bg); }
+    .nav-cta:hover { background: var(--ruby-mid); transform: scale(1.04); }
 
     /* ── HERO ── */
-    #hero {
-      position: relative; min-height: 100vh;
+    .hero {
+      min-height: 100vh;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      text-align: center; overflow: hidden;
-      padding: 6rem 2rem 4rem;
+      text-align: center; padding: 8rem 2rem 4rem;
+      position: relative;
     }
-    .hero-bg {
-      position: absolute; inset: 0; z-index: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 40%, oklch(30% 0.12 18 / 0.35) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 40% at 80% 20%, oklch(48% 0.24 18 / 0.15) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 50% at 20% 80%, oklch(74% 0.14 72 / 0.08) 0%, transparent 60%),
-        var(--bg);
-    }
-    .hero-grain {
-      position: absolute; inset: 0; z-index: 1; opacity: 0.04;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      background-size: 200px;
-    }
-    .hero-content { position: relative; z-index: 2; max-width: 900px; }
     .hero-eyebrow {
-      font-family: var(--font-body);
-      font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 1.5rem;
-      opacity: 0; transform: translateY(20px);
+      font-family: var(--font-elegant);
+      font-size: 1rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.5rem; opacity: 0;
+      font-style: italic;
     }
     .hero-title {
       font-family: var(--font-display);
-      font-size: clamp(3.5rem, 10vw, 9rem);
-      font-weight: 900; line-height: 0.95;
-      letter-spacing: -0.02em;
-      color: var(--cream);
-      margin-bottom: 0.2em;
+      font-size: clamp(3.5rem, 9vw, 9rem);
+      font-weight: 900; line-height: 0.9;
+      letter-spacing: -0.02em; margin-bottom: 1.5rem;
       opacity: 0;
     }
-    .hero-title em {
-      font-style: italic; color: var(--ruby-mid);
-      display: block;
+    .hero-title .line-ruby {
+      background: linear-gradient(135deg, var(--ruby), var(--pink), var(--ruby-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; background-size: 200%;
+      animation: shimmer 4s linear infinite;
     }
-    .hero-subtitle {
-      font-family: var(--font-elegant);
-      font-size: clamp(1rem, 2.5vw, 1.4rem);
-      font-weight: 300; font-style: italic;
-      color: var(--muted); margin: 1.5rem 0 2.5rem;
-      opacity: 0;
+    @keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+    .hero-title .line-nails { color: var(--cream); display: block; }
+    .hero-sub {
+      font-family: var(--font-elegant); font-size: 1.25rem;
+      color: var(--muted); max-width: 480px; margin: 0 auto 2.5rem;
+      font-style: italic; opacity: 0;
     }
-    .hero-actions {
-      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
-      opacity: 0;
-    }
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; opacity: 0; }
     .btn-primary {
-      padding: 1rem 2.4rem;
-      background: var(--ruby);
-      color: var(--cream);
-      border: none; font-family: var(--font-body);
-      font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase;
-      text-decoration: none; cursor: none;
-      transition: background 0.3s var(--ease-expo), transform 0.3s var(--ease-back);
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--ruby), var(--pink));
+      color: var(--cream); border: none; border-radius: 3rem;
+      font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: none; transition: transform 0.3s var(--ease-back), box-shadow 0.3s;
+      box-shadow: 0 0 30px oklch(52% 0.28 18 / 0.4);
     }
-    .btn-primary:hover { background: var(--ruby-mid); transform: translateY(-2px); }
-    .btn-ghost {
-      padding: 1rem 2.4rem;
-      background: transparent;
-      color: var(--cream);
-      border: 1px solid var(--border);
-      font-family: var(--font-body);
-      font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase;
-      text-decoration: none; cursor: none;
-      transition: border-color 0.3s, color 0.3s;
+    .btn-primary:hover { transform: scale(1.06) translateY(-2px); box-shadow: 0 0 50px oklch(52% 0.28 18 / 0.6); }
+    .btn-outline {
+      padding: 1rem 2.5rem;
+      background: transparent; color: var(--gold);
+      border: 1px solid var(--gold); border-radius: 3rem;
+      font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: none; transition: background 0.3s, color 0.3s, transform 0.2s;
     }
-    .btn-ghost:hover { border-color: var(--cream); }
+    .btn-outline:hover { background: var(--gold); color: var(--bg); transform: scale(1.04); }
 
-    /* Floating bottles */
-    .floaters {
-      position: absolute; inset: 0; z-index: 1;
-      pointer-events: none; overflow: hidden;
+    /* Hero floating bottles */
+    .hero-bottles {
+      display: flex; gap: 3rem; align-items: flex-end;
+      margin: 3rem auto 0; opacity: 0;
     }
-    .floater {
-      position: absolute;
-      width: 60px; opacity: 0.18;
-      animation: floatDrift linear infinite;
-    }
-    .floater svg { width: 100%; height: auto; }
-    .floater:nth-child(1) { left: 8%; top: 15%; width: 45px; animation-duration: 14s; animation-delay: 0s; }
-    .floater:nth-child(2) { right: 10%; top: 20%; width: 55px; animation-duration: 18s; animation-delay: -5s; }
-    .floater:nth-child(3) { left: 15%; bottom: 25%; width: 35px; animation-duration: 12s; animation-delay: -3s; }
-    .floater:nth-child(4) { right: 18%; bottom: 30%; width: 48px; animation-duration: 16s; animation-delay: -8s; }
-    .floater:nth-child(5) { left: 50%; top: 10%; width: 30px; animation-duration: 20s; animation-delay: -2s; }
-
-    @keyframes floatDrift {
-      0%   { transform: translateY(0px) rotate(0deg); }
-      33%  { transform: translateY(-24px) rotate(5deg); }
-      66%  { transform: translateY(12px) rotate(-3deg); }
-      100% { transform: translateY(0px) rotate(0deg); }
-    }
-
-    .scroll-hint {
-      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
-      z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
-      opacity: 0;
-    }
-    .scroll-line {
-      width: 1px; height: 50px; background: var(--border);
-      position: relative; overflow: hidden;
-    }
-    .scroll-line::after {
-      content: ''; position: absolute; top: -100%;
-      width: 100%; height: 100%;
-      background: var(--gold);
-      animation: scrollDown 1.8s ease-in-out infinite;
-    }
-    @keyframes scrollDown {
-      0%   { top: -100%; }
-      100% { top: 200%; }
+    .bottle-wrap { position: relative; }
+    .bottle-wrap svg { filter: drop-shadow(0 20px 40px oklch(52% 0.28 18 / 0.5)); }
+    .bottle-badge {
+      position: absolute; top: -10px; right: -15px;
+      background: var(--gold); color: var(--bg);
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      padding: 0.25rem 0.6rem; border-radius: 2rem; text-transform: uppercase;
     }
 
     /* ── MARQUEE ── */
-    .marquee-wrap {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+    .marquee-strip {
       padding: 1rem 0; overflow: hidden;
-      background: var(--surface);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: oklch(9% 0.025 355 / 0.8);
     }
     .marquee-track {
-      display: flex; width: max-content;
-      animation: marquee 30s linear infinite;
+      display: flex; gap: 3rem; width: max-content;
+      animation: marquee 28s linear infinite;
     }
+    .marquee-track:hover { animation-play-state: paused; }
     .marquee-item {
-      white-space: nowrap; padding: 0 3rem;
-      font-family: var(--font-display); font-style: italic;
-      font-size: 1.1rem; color: var(--muted);
-      display: flex; align-items: center; gap: 3rem;
+      font-family: var(--font-elegant); font-size: 1rem;
+      color: var(--muted); white-space: nowrap; font-style: italic;
+      display: flex; align-items: center; gap: 1rem;
     }
-    .marquee-item span { color: var(--gold); font-style: normal; font-size: 0.6rem; }
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
+    .marquee-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-    /* ── SECTIONS ── */
-    section { position: relative; }
-    .section-label {
-      font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 1rem;
+    /* ── PRESS STRIP ── */
+    .press { padding: 4rem 3rem; text-align: center; }
+    .press-label {
+      font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 2.5rem;
     }
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-weight: 700; line-height: 1.1;
-      letter-spacing: -0.01em;
+    .press-logos {
+      display: flex; gap: 3rem; justify-content: center; align-items: center;
+      flex-wrap: wrap;
     }
-    .section-title em { font-style: italic; color: var(--ruby-mid); }
+    .press-logo {
+      font-family: var(--font-display); font-size: 1.1rem;
+      color: oklch(40% 0.05 355); letter-spacing: 0.15em;
+      font-weight: 600; text-transform: uppercase;
+      transition: color 0.3s;
+      font-style: italic;
+    }
+    .press-logo:hover { color: var(--gold); }
 
     /* ── ABOUT ── */
-    #about {
-      padding: 8rem 4rem;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
-      align-items: center; max-width: 1300px; margin: 0 auto;
+    .about {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; padding: 8rem 5rem;
+      align-items: center;
     }
     .about-visual {
       position: relative; aspect-ratio: 3/4;
+      border-radius: 2rem; overflow: hidden;
     }
-    .about-card {
-      position: absolute; border-radius: 2px;
-      overflow: hidden;
+    .about-visual-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, oklch(14% 0.04 18), oklch(10% 0.03 300));
+      border-radius: 2rem;
     }
-    .about-card-main {
-      inset: 0;
-      background: linear-gradient(135deg,
-        oklch(30% 0.18 18) 0%,
-        oklch(20% 0.12 18) 40%,
-        oklch(15% 0.08 355) 100%);
+    .about-visual-svgs {
+      position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
     }
-    .about-card-accent {
-      width: 55%; aspect-ratio: 1;
-      bottom: -2rem; right: -2rem;
-      background: var(--surface-hi);
-      border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      padding: 2rem;
+    .about-visual-border {
+      position: absolute; inset: 0;
+      border: 1px solid oklch(52% 0.28 18 / 0.3);
+      border-radius: 2rem;
     }
-    .about-stat {
-      text-align: center;
+    .about-tag {
+      position: absolute; bottom: 2rem; left: 2rem;
+      background: oklch(7% 0.022 355 / 0.85);
+      backdrop-filter: blur(16px); border: 1px solid var(--border);
+      border-radius: 1rem; padding: 1rem 1.5rem;
     }
-    .about-stat-num {
-      font-family: var(--font-display); font-size: 3.5rem;
-      font-weight: 900; color: var(--ruby-mid);
-      line-height: 1; display: block;
+    .about-tag-num { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--gold); }
+    .about-tag-text { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; }
+    .about-text h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem;
     }
-    .about-stat-label {
-      font-size: 0.7rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--muted);
+    .about-text h2 em { color: var(--ruby-light); font-style: italic; }
+    .about-text p { color: var(--muted); margin-bottom: 1.5rem; font-size: 1.05rem; }
+    .about-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.5rem; margin-top: 2.5rem;
     }
-    .bottle-large {
-      width: 45%; opacity: 0.85;
+    .stat-box {
+      padding: 1.5rem; border-radius: 1rem;
+      background: var(--surface); border: 1px solid var(--border);
     }
-    .about-text { }
-    .about-text p {
-      color: var(--muted); margin-top: 1.5rem; font-size: 1rem;
-      line-height: 1.8;
+    .stat-num {
+      font-family: var(--font-display); font-size: 2.2rem;
+      font-weight: 700; color: var(--gold);
     }
-    .about-features {
-      margin-top: 2.5rem;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-    }
-    .about-feature {
-      padding: 1.2rem;
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--ruby);
-    }
-    .about-feature-name {
-      font-size: 0.75rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--cream);
-      margin-bottom: 0.3rem;
-    }
-    .about-feature p {
-      margin: 0; font-size: 0.8rem; color: var(--muted);
-    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 0.25rem; }
 
     /* ── PRODUCTS ── */
-    #products {
-      padding: 8rem 4rem;
-      background: var(--surface);
+    .products { padding: 8rem 3rem; }
+    .section-header { text-align: center; margin-bottom: 5rem; }
+    .section-eyebrow {
+      font-family: var(--font-elegant); font-size: 1rem;
+      letter-spacing: 0.2em; color: var(--gold); font-style: italic;
+      margin-bottom: 1rem; display: block;
     }
-    .products-header {
-      text-align: center; margin-bottom: 4rem;
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700; line-height: 1.1;
     }
-    .products-grid {
+    .section-title span { color: var(--ruby-light); }
+    .section-sub {
+      color: var(--muted); max-width: 500px;
+      margin: 1rem auto 0; font-size: 1rem;
+    }
+    .product-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem; max-width: 1300px; margin: 0 auto;
+      gap: 2rem; max-width: 1200px; margin: 0 auto;
     }
     .product-card {
-      position: relative; overflow: hidden;
-      background: var(--bg);
+      background: var(--surface);
       border: 1px solid var(--border);
-      padding: 2.5rem 2rem;
-      cursor: none;
+      border-radius: 1.5rem; overflow: hidden;
+      cursor: none; position: relative;
+      transition: border-color 0.3s;
       transform-style: preserve-3d;
-      transition: border-color 0.4s;
     }
-    .product-card:hover { border-color: oklch(48% 0.24 18 / 0.4); }
-    .product-card-glow {
-      position: absolute; inset: 0; opacity: 0;
+    .product-card:hover { border-color: oklch(52% 0.28 18 / 0.6); }
+    .product-card-img {
+      aspect-ratio: 1; display: flex;
+      align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--surface-hi), var(--surface));
+      position: relative; overflow: hidden;
+    }
+    .product-card-img::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 120%, var(--glow-color, oklch(52% 0.28 18 / 0.15)), transparent 70%);
       transition: opacity 0.4s;
-      pointer-events: none;
     }
-    .product-card:hover .product-card-glow { opacity: 1; }
-    .product-swatch {
-      width: 64px; height: 64px; border-radius: 50%;
-      margin-bottom: 1.5rem;
-      position: relative;
-      box-shadow: 0 8px 32px currentColor;
+    .product-card:hover .product-card-img::after { opacity: 1.5; }
+    .product-pill {
+      position: absolute; top: 1rem; right: 1rem;
+      background: var(--ruby); color: var(--cream);
+      font-size: 0.65rem; font-weight: 600;
+      padding: 0.2rem 0.7rem; border-radius: 2rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
     }
-    .product-badge {
-      position: absolute; top: 1.5rem; right: 1.5rem;
-      font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
-      padding: 0.3rem 0.7rem; border: 1px solid var(--gold);
-      color: var(--gold);
-    }
+    .product-card-body { padding: 1.5rem; }
     .product-name {
-      font-family: var(--font-display); font-size: 1.3rem;
+      font-family: var(--font-display); font-size: 1.15rem;
       font-weight: 600; margin-bottom: 0.4rem;
-      color: var(--cream);
     }
-    .product-desc {
-      font-size: 0.85rem; color: var(--muted);
-      line-height: 1.6; margin-bottom: 1.5rem;
+    .product-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.5; }
+    .product-swatches { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
+    .swatch {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid var(--border); cursor: none;
+      transition: transform 0.2s; flex-shrink: 0;
+    }
+    .swatch:hover { transform: scale(1.3); }
+    .product-footer {
+      display: flex; align-items: center; justify-content: space-between;
     }
     .product-price {
-      font-family: var(--font-display); font-size: 1.4rem;
-      color: var(--gold); margin-bottom: 1.2rem;
-    }
-    .product-price span {
-      font-size: 0.85rem; color: var(--muted);
-      font-family: var(--font-body); font-weight: 300;
+      font-family: var(--font-display); font-size: 1.3rem;
+      font-weight: 600; color: var(--gold);
     }
     .product-btn {
-      display: inline-block; width: 100%; text-align: center;
-      padding: 0.75rem; font-size: 0.75rem;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      background: transparent; border: 1px solid var(--border);
-      color: var(--cream); text-decoration: none; cursor: none;
-      transition: background 0.3s, border-color 0.3s;
+      padding: 0.5rem 1.25rem;
+      background: transparent; color: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 2rem; font-size: 0.8rem;
+      letter-spacing: 0.08em; cursor: none;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s var(--ease-back);
     }
     .product-btn:hover {
-      background: var(--ruby);
-      border-color: var(--ruby);
+      background: var(--ruby); border-color: var(--ruby);
+      transform: scale(1.05);
     }
+
+    /* ── FORMULA ── */
+    .formula { padding: 8rem 3rem; }
+    .formula-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center; max-width: 1200px; margin: 0 auto;
+    }
+    .formula-badges {
+      display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+    }
+    .formula-badge {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 2rem; font-size: 0.8rem;
+      color: var(--muted); letter-spacing: 0.08em;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .formula-badge:hover { border-color: var(--gold); color: var(--gold); }
+    .formula-badge.active { border-color: var(--ruby); color: var(--ruby-light); }
+    .formula-ingredients { list-style: none; }
+    .formula-ingredients li {
+      display: flex; gap: 1rem; padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border); align-items: flex-start;
+    }
+    .ingredient-icon {
+      width: 40px; height: 40px; border-radius: 0.75rem;
+      background: var(--surface-hi); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .ingredient-name { font-weight: 500; margin-bottom: 0.2rem; }
+    .ingredient-desc { font-size: 0.82rem; color: var(--muted); }
+    .formula-visual {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 2rem; padding: 3rem;
+      display: flex; flex-direction: column; gap: 1.5rem;
+    }
+    .formula-circle {
+      width: 200px; height: 200px;
+      border-radius: 50%; margin: 0 auto;
+      background: conic-gradient(
+        var(--ruby) 0% 35%,
+        var(--gold) 35% 55%,
+        var(--pink) 55% 70%,
+        var(--purple) 70% 85%,
+        var(--coral) 85% 100%
+      );
+      position: relative; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .formula-circle-inner {
+      width: 130px; height: 130px; border-radius: 50%;
+      background: var(--surface); display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+    }
+    .formula-circle-num {
+      font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--gold);
+    }
+    .formula-circle-text { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .formula-legend { display: flex; flex-direction: column; gap: 0.75rem; }
+    .legend-item { display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
     /* ── RITUAL ── */
-    #ritual {
-      padding: 8rem 4rem;
-      max-width: 1300px; margin: 0 auto;
-    }
-    .ritual-grid {
-      margin-top: 4rem;
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
-    }
-    .ritual-step {
-      padding: 3rem 2rem;
-      border-right: 1px solid var(--border);
+    .ritual { padding: 8rem 3rem; text-align: center; }
+    .ritual-steps {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 2rem; max-width: 1100px; margin: 4rem auto 0;
       position: relative;
     }
-    .ritual-step:last-child { border-right: none; }
-    .ritual-num {
-      font-family: var(--font-display); font-size: 4rem;
-      font-weight: 900; line-height: 1;
-      color: oklch(22% 0.06 355);
-      margin-bottom: 1rem;
+    .ritual-steps::before {
+      content: ''; position: absolute; top: 2.5rem; left: 12.5%; right: 12.5%;
+      height: 1px; background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
     }
-    .ritual-icon {
-      width: 48px; height: 48px; margin-bottom: 1rem;
-      color: var(--ruby-mid);
+    .ritual-step { position: relative; }
+    .step-num {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--ruby), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 0 30px oklch(52% 0.28 18 / 0.4);
     }
-    .ritual-title {
-      font-family: var(--font-display); font-size: 1.1rem;
-      font-weight: 600; margin-bottom: 0.75rem;
+    .step-icon { font-size: 1.5rem; margin-bottom: 1rem; }
+    .step-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .step-desc { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── LOOKBOOK ── */
+    .lookbook { padding: 8rem 3rem; }
+    .lookbook-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1.5rem; max-width: 1200px; margin: 4rem auto 0;
     }
-    .ritual-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .lookbook-item {
+      border-radius: 1.25rem; overflow: hidden;
+      background: var(--surface-hi);
+      position: relative; cursor: none;
+      transition: transform 0.4s var(--ease-expo);
+    }
+    .lookbook-item:hover { transform: scale(1.02); }
+    .lookbook-item.tall { grid-row: span 2; }
+    .lookbook-swatch {
+      width: 100%; height: 100%;
+      min-height: 200px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem; padding: 2rem;
+    }
+    .lookbook-swatch.l1 { background: linear-gradient(135deg, oklch(20% 0.08 18), oklch(12% 0.04 355)); min-height: 400px; }
+    .lookbook-swatch.l2 { background: linear-gradient(135deg, oklch(18% 0.06 72), oklch(12% 0.04 355)); }
+    .lookbook-swatch.l3 { background: linear-gradient(135deg, oklch(16% 0.08 345), oklch(10% 0.04 300)); }
+    .lookbook-swatch.l4 { background: linear-gradient(135deg, oklch(14% 0.05 300), oklch(10% 0.03 355)); }
+    .lookbook-swatch.l5 { background: linear-gradient(135deg, oklch(18% 0.06 35), oklch(12% 0.04 355)); }
+    .lookbook-label {
+      font-family: var(--font-display); font-size: 1.2rem;
+      font-weight: 600; color: var(--cream); text-align: center;
+    }
+    .lookbook-sub { font-size: 0.8rem; color: var(--muted); text-align: center; }
+    .lookbook-item-overlay {
+      position: absolute; inset: 0;
+      background: oklch(7% 0.022 355 / 0.0);
+      transition: background 0.3s; display: flex;
+      align-items: flex-end; padding: 1.5rem;
+    }
+    .lookbook-item:hover .lookbook-item-overlay { background: oklch(7% 0.022 355 / 0.4); }
 
     /* ── TESTIMONIALS ── */
-    #testimonials {
-      padding: 8rem 4rem;
-      background: var(--surface);
-      overflow: hidden;
-    }
-    .testimonials-header { text-align: center; margin-bottom: 4rem; }
-    .testimonials-track {
-      display: flex; gap: 1.5rem;
-      transition: transform 0.6s var(--ease-expo);
+    .testimonials { padding: 8rem 3rem; }
+    .testimonials-carousel {
+      display: flex; gap: 2rem; max-width: 1200px;
+      margin: 4rem auto 0; overflow: hidden;
     }
     .testimonial-card {
-      flex: 0 0 380px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 2.5rem;
+      flex: 0 0 calc(33.333% - 1.33rem);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 1.5rem; padding: 2rem; position: relative;
     }
-    .testimonial-stars {
-      color: var(--gold); font-size: 0.9rem; margin-bottom: 1.2rem;
-      letter-spacing: 0.1em;
+    .testimonial-quote {
+      font-family: var(--font-elegant); font-size: 3rem;
+      color: var(--ruby); line-height: 1; margin-bottom: 1rem;
     }
     .testimonial-text {
-      font-family: var(--font-elegant);
-      font-size: 1.1rem; font-style: italic;
-      line-height: 1.7; color: var(--cream);
-      margin-bottom: 1.5rem;
+      font-family: var(--font-elegant); font-size: 1.05rem;
+      font-style: italic; color: var(--cream); margin-bottom: 1.5rem; line-height: 1.6;
     }
+    .testimonial-stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 1rem; letter-spacing: 0.1em; }
     .testimonial-author {
-      display: flex; align-items: center; gap: 0.75rem;
+      display: flex; align-items: center; gap: 1rem;
     }
     .author-avatar {
       width: 40px; height: 40px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--ruby), var(--ruby-light));
+      background: linear-gradient(135deg, var(--ruby), var(--pink));
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-display); font-size: 0.9rem; font-weight: 700;
-      color: var(--cream);
+      font-family: var(--font-display); font-weight: 700; font-size: 0.9rem;
     }
-    .author-name { font-size: 0.85rem; font-weight: 500; color: var(--cream); }
-    .author-handle { font-size: 0.75rem; color: var(--muted); }
-    .testimonials-nav {
-      display: flex; justify-content: center; gap: 0.75rem; margin-top: 2.5rem;
+    .author-name { font-weight: 500; font-size: 0.9rem; }
+    .author-handle { font-size: 0.78rem; color: var(--muted); }
+    .carousel-controls { display: flex; gap: 1rem; justify-content: center; margin-top: 2.5rem; }
+    .carousel-btn {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--cream); cursor: none; font-size: 1.1rem;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
     }
-    .t-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--border); cursor: none;
-      transition: background 0.3s, transform 0.3s;
-    }
-    .t-dot.active { background: var(--ruby-mid); transform: scale(1.5); }
+    .carousel-btn:hover { background: var(--ruby); border-color: var(--ruby); transform: scale(1.1); }
 
-    /* ── STATS ── */
-    #stats {
-      padding: 6rem 4rem;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+    /* ── FAQ ── */
+    .faq { padding: 8rem 3rem; max-width: 800px; margin: 0 auto; }
+    .faq-item {
+      border-bottom: 1px solid var(--border); overflow: hidden;
     }
-    .stats-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 2rem; max-width: 1100px; margin: 0 auto;
-      text-align: center;
+    .faq-q {
+      width: 100%; background: none; border: none; color: var(--cream);
+      font-family: var(--font-body); font-size: 1rem; font-weight: 500;
+      text-align: left; padding: 1.5rem 0;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: none; transition: color 0.25s;
     }
-    .stat-num {
-      font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 900; color: var(--ruby-mid);
-      display: block; line-height: 1;
+    .faq-q:hover { color: var(--gold); }
+    .faq-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid var(--border); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+      transition: background 0.3s, border-color 0.3s, transform 0.4s;
     }
-    .stat-unit { color: var(--gold); }
-    .stat-label {
-      font-size: 0.75rem; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--muted);
-      margin-top: 0.5rem; display: block;
+    .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--ruby); border-color: var(--ruby); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.5s var(--ease-expo), padding 0.3s;
+      color: var(--muted); font-size: 0.95rem; line-height: 1.7;
     }
+    .faq-item.open .faq-a { max-height: 300px; padding-bottom: 1.5rem; }
 
     /* ── CTA ── */
-    #cta {
-      padding: 10rem 4rem;
-      text-align: center;
-      background:
-        radial-gradient(ellipse 70% 70% at 50% 50%, oklch(25% 0.12 18 / 0.3) 0%, transparent 70%),
-        var(--bg);
+    .cta-section {
+      padding: 10rem 3rem; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-glow {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, oklch(52% 0.28 18 / 0.2), transparent 70%);
+      pointer-events: none;
     }
     .cta-title {
       font-family: var(--font-display);
       font-size: clamp(2.5rem, 6vw, 5rem);
-      font-weight: 900; line-height: 1.05;
-      max-width: 700px; margin: 0 auto 1.5rem;
+      font-weight: 700; margin-bottom: 1.5rem; position: relative;
     }
-    .cta-title em { font-style: italic; color: var(--ruby-mid); }
-    .cta-sub {
-      font-family: var(--font-elegant); font-style: italic;
-      font-size: 1.2rem; color: var(--muted); margin-bottom: 3rem;
-    }
-    .cta-form {
-      display: flex; gap: 0; max-width: 460px; margin: 0 auto;
-    }
+    .cta-title span { color: var(--ruby-light); }
+    .cta-sub { color: var(--muted); max-width: 450px; margin: 0 auto 3rem; position: relative; }
+    .cta-form { display: flex; gap: 0.75rem; justify-content: center; max-width: 440px; margin: 0 auto; position: relative; }
     .cta-input {
       flex: 1; padding: 1rem 1.5rem;
       background: var(--surface); border: 1px solid var(--border);
-      border-right: none; color: var(--cream);
-      font-family: var(--font-body); font-size: 0.9rem;
-      outline: none;
+      border-radius: 3rem; color: var(--cream); font-size: 0.9rem;
+      outline: none; transition: border-color 0.3s;
     }
-    .cta-input::placeholder { color: var(--muted); }
     .cta-input:focus { border-color: var(--ruby); }
+    .cta-input::placeholder { color: var(--muted); }
     .cta-submit {
-      padding: 1rem 1.8rem;
-      background: var(--ruby); border: 1px solid var(--ruby);
-      color: var(--cream); font-family: var(--font-body);
-      font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
-      cursor: none; transition: background 0.3s;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, var(--ruby), var(--pink));
+      color: var(--cream); border: none; border-radius: 3rem;
+      font-size: 0.85rem; letter-spacing: 0.08em;
+      cursor: none; white-space: nowrap;
+      transition: transform 0.3s var(--ease-back), box-shadow 0.3s;
     }
-    .cta-submit:hover { background: var(--ruby-mid); }
-    .cta-promise {
-      margin-top: 1rem; font-size: 0.75rem; color: var(--muted);
-    }
+    .cta-submit:hover { transform: scale(1.06); box-shadow: 0 0 30px oklch(52% 0.28 18 / 0.5); }
+    .cta-privacy { font-size: 0.75rem; color: var(--muted); margin-top: 1rem; position: relative; }
 
     /* ── FOOTER ── */
     footer {
-      padding: 4rem;
+      padding: 5rem 3rem 3rem;
       border-top: 1px solid var(--border);
-      background: var(--surface);
-    }
-    .footer-inner {
-      max-width: 1300px; margin: 0 auto;
       display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
       gap: 3rem;
     }
-    .footer-brand { }
-    .footer-logo {
-      font-family: var(--font-display); font-size: 1.4rem;
-      font-weight: 700; color: var(--cream); margin-bottom: 1rem;
-    }
-    .footer-logo span { color: var(--ruby-mid); }
-    .footer-tagline {
-      font-family: var(--font-elegant); font-style: italic;
-      color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;
-    }
-    .footer-social { display: flex; gap: 0.75rem; }
-    .social-btn {
-      width: 36px; height: 36px; border: 1px solid var(--border);
+    .footer-brand .nav-logo { font-size: 1.8rem; display: block; margin-bottom: 1rem; }
+    .footer-brand p { font-size: 0.85rem; color: var(--muted); max-width: 240px; line-height: 1.7; }
+    .footer-socials { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .social-link {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
       display: flex; align-items: center; justify-content: center;
-      color: var(--muted); text-decoration: none;
-      transition: border-color 0.3s, color 0.3s; cursor: none;
+      font-size: 0.85rem; text-decoration: none; color: var(--muted);
+      cursor: none; transition: background 0.3s, color 0.3s;
     }
-    .social-btn:hover { border-color: var(--ruby-mid); color: var(--cream); }
-    .footer-col-title {
-      font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 1.2rem;
+    .social-link:hover { background: var(--ruby); color: var(--cream); }
+    .footer-col h4 {
+      font-family: var(--font-display); font-size: 0.85rem;
+      font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      margin-bottom: 1.5rem; color: var(--cream);
     }
-    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
-    .footer-links a {
-      font-size: 0.85rem; color: var(--muted);
-      text-decoration: none; transition: color 0.3s;
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .footer-col ul a {
+      text-decoration: none; color: var(--muted); font-size: 0.85rem;
+      transition: color 0.25s;
     }
-    .footer-links a:hover { color: var(--cream); }
+    .footer-col ul a:hover { color: var(--cream); }
     .footer-bottom {
-      max-width: 1300px; margin: 3rem auto 0;
-      padding-top: 2rem; border-top: 1px solid var(--border);
+      grid-column: 1 / -1;
+      padding-top: 3rem; border-top: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.78rem; color: var(--muted);
     }
-    .footer-copy { font-size: 0.75rem; color: var(--muted); }
-    .footer-legal { display: flex; gap: 1.5rem; }
-    .footer-legal a { font-size: 0.75rem; color: var(--muted); text-decoration: none; }
-    .footer-legal a:hover { color: var(--cream); }
 
-    /* ── ANIMATIONS ── */
+    /* ── PRODUCT MODAL ── */
+    #modal-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: oklch(3% 0.01 355 / 0.85);
+      backdrop-filter: blur(12px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    #modal-overlay.open { opacity: 1; pointer-events: all; }
+    #product-modal {
+      position: fixed; bottom: 0; left: 50%; z-index: 501;
+      transform: translateX(-50%) translateY(100%);
+      width: min(680px, 95vw);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2rem 2rem 0 0;
+      padding: 2.5rem;
+      transition: transform 0.6s var(--ease-spring);
+    }
+    #product-modal.open { transform: translateX(-50%) translateY(0); }
+    .modal-handle {
+      width: 48px; height: 4px; border-radius: 2px;
+      background: var(--border); margin: 0 auto 2rem;
+    }
+    .modal-inner {
+      display: grid; grid-template-columns: 1fr 1.3fr; gap: 2.5rem; align-items: start;
+    }
+    .modal-visual {
+      background: linear-gradient(135deg, var(--surface-hi), var(--surface));
+      border-radius: 1.5rem; aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-badge {
+      display: inline-block; padding: 0.3rem 0.9rem;
+      background: oklch(52% 0.28 18 / 0.2); border: 1px solid oklch(52% 0.28 18 / 0.4);
+      border-radius: 2rem; font-size: 0.72rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ruby-light); margin-bottom: 0.75rem;
+    }
+    .modal-name {
+      font-family: var(--font-display); font-size: 1.8rem;
+      font-weight: 700; margin-bottom: 0.5rem; line-height: 1.1;
+    }
+    .modal-tagline { color: var(--muted); font-style: italic; font-family: var(--font-elegant); font-size: 1rem; margin-bottom: 1.25rem; }
+    .modal-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+    .modal-swatches-label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    .modal-swatches { display: flex; gap: 0.6rem; margin-bottom: 1.5rem; }
+    .modal-swatch {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid transparent; cursor: none;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .modal-swatch:hover, .modal-swatch.active { transform: scale(1.2); border-color: var(--cream); }
+    .modal-price-row { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .modal-price { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--gold); }
+    .modal-price-original { font-size: 1rem; color: var(--muted); text-decoration: line-through; }
+    .modal-add-btn {
+      width: 100%; padding: 1rem;
+      background: linear-gradient(135deg, var(--ruby), var(--pink));
+      color: var(--cream); border: none; border-radius: 3rem;
+      font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: none; font-weight: 500;
+      transition: transform 0.3s var(--ease-back), box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .modal-add-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: white; opacity: 0; transition: opacity 0.3s;
+    }
+    .modal-add-btn:hover { transform: scale(1.03); box-shadow: 0 0 40px oklch(52% 0.28 18 / 0.5); }
+    .modal-add-btn.clicked::after { animation: btnFlash 0.4s; }
+    @keyframes btnFlash { 0%{opacity:0.3} 100%{opacity:0} }
+    .modal-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--surface-hi); border: 1px solid var(--border);
+      color: var(--cream); cursor: none; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .modal-close:hover { background: var(--ruby); transform: rotate(90deg); }
+
+    /* ── UTILITIES ── */
     .reveal { opacity: 0; transform: translateY(40px); }
-    .reveal-left { opacity: 0; transform: translateX(-40px); }
-    .reveal-right { opacity: 0; transform: translateX(40px); }
+    .reveal-left { opacity: 0; transform: translateX(-50px); }
+    .reveal-right { opacity: 0; transform: translateX(50px); }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      #about { grid-template-columns: 1fr; gap: 3rem; padding: 5rem 2rem; }
-      .about-visual { aspect-ratio: 4/3; max-width: 500px; }
-      .products-grid { grid-template-columns: repeat(2, 1fr); }
-      .ritual-grid { grid-template-columns: repeat(2, 1fr); }
-      .ritual-step:nth-child(2) { border-right: none; }
-      .ritual-step { border-bottom: 1px solid var(--border); }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .footer-inner { grid-template-columns: 1fr 1fr; }
-      nav { padding: 1.5rem 2rem; }
-    }
-    @media (max-width: 640px) {
-      .products-grid { grid-template-columns: 1fr; }
-      .ritual-grid { grid-template-columns: 1fr; }
-      .ritual-step { border-right: none; }
-      .about-features { grid-template-columns: 1fr; }
-      nav { padding: 1.2rem 1.5rem; }
+    @media (max-width: 900px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+      .about { grid-template-columns: 1fr; padding: 5rem 2rem; }
+      .formula-grid { grid-template-columns: 1fr; }
+      .ritual-steps { grid-template-columns: 1fr 1fr; }
+      footer { grid-template-columns: 1fr 1fr; }
+      .lookbook-grid { grid-template-columns: 1fr 1fr; }
+      .testimonials-carousel { flex-wrap: wrap; }
+      .testimonial-card { flex: 0 0 100%; }
+      nav { padding: 1rem 1.5rem; }
       .nav-links { display: none; }
-      #about, #products, #ritual, #testimonials, #stats, #cta { padding: 5rem 1.5rem; }
-      footer { padding: 3rem 1.5rem; }
-      .footer-inner { grid-template-columns: 1fr; }
-      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+      .modal-inner { grid-template-columns: 1fr; }
+      .modal-visual { max-height: 200px; }
+    }
+    @media (max-width: 600px) {
+      .product-grid { grid-template-columns: 1fr; }
+      .ritual-steps { grid-template-columns: 1fr; }
+      .ritual-steps::before { display: none; }
+      .hero-bottles { gap: 1.5rem; }
+      footer { grid-template-columns: 1fr; }
+      .about-stats { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- Cursor -->
-<div id="cursor"><div id="cursor-dot"></div></div>
-<div id="cursor-ring"></div>
+  <!-- ── BACKGROUND ── -->
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+    <div class="blob blob-5"></div>
+  </div>
+  <canvas id="sparkle-canvas" aria-hidden="true"></canvas>
 
-<!-- Nav -->
-<nav id="nav">
-  <a href="#" class="nav-logo">Ruby<span>.</span></a>
-  <ul class="nav-links">
-    <li><a href="#about">Story</a></li>
-    <li><a href="#products">Collection</a></li>
-    <li><a href="#ritual">Ritual</a></li>
-    <li><a href="#testimonials">Reviews</a></li>
-  </ul>
-  <a href="#cta" class="nav-cta">Shop Now</a>
-</nav>
-
-<!-- Hero -->
-<section id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grain"></div>
-
-  <div class="floaters">
-    <!-- Nail bottle SVGs -->
-    <div class="floater">
-      <svg viewBox="0 0 60 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="22" y="2" width="16" height="12" rx="2" fill="#d4a853" opacity="0.8"/>
-        <rect x="24" y="14" width="12" height="6" rx="1" fill="#d4a853" opacity="0.6"/>
-        <rect x="10" y="20" width="40" height="80" rx="8" fill="url(#b1)"/>
-        <rect x="10" y="88" width="40" height="30" rx="4" fill="#c1121f" opacity="0.9"/>
-        <rect x="14" y="24" width="8" height="40" rx="4" fill="white" opacity="0.15"/>
-        <defs><linearGradient id="b1" x1="10" y1="20" x2="50" y2="100" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#8b1a2a"/><stop offset="1" stop-color="#c1121f"/>
-        </linearGradient></defs>
-      </svg>
-    </div>
-    <div class="floater">
-      <svg viewBox="0 0 60 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="22" y="2" width="16" height="12" rx="2" fill="#f0d080" opacity="0.8"/>
-        <rect x="24" y="14" width="12" height="6" rx="1" fill="#d4a853" opacity="0.6"/>
-        <rect x="10" y="20" width="40" height="80" rx="8" fill="url(#b2)"/>
-        <rect x="10" y="88" width="40" height="30" rx="4" fill="#b8860b" opacity="0.9"/>
-        <rect x="14" y="24" width="8" height="40" rx="4" fill="white" opacity="0.15"/>
-        <defs><linearGradient id="b2" x1="10" y1="20" x2="50" y2="100" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#8b6914"/><stop offset="1" stop-color="#d4a853"/>
-        </linearGradient></defs>
-      </svg>
-    </div>
-    <div class="floater">
-      <svg viewBox="0 0 60 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="22" y="2" width="16" height="12" rx="2" fill="#d4a853" opacity="0.8"/>
-        <rect x="24" y="14" width="12" height="6" rx="1" fill="#d4a853" opacity="0.6"/>
-        <rect x="10" y="20" width="40" height="80" rx="8" fill="url(#b3)"/>
-        <rect x="10" y="88" width="40" height="30" rx="4" fill="#7b1a4a" opacity="0.9"/>
-        <rect x="14" y="24" width="8" height="40" rx="4" fill="white" opacity="0.15"/>
-        <defs><linearGradient id="b3" x1="10" y1="20" x2="50" y2="100" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#4a0a2a"/><stop offset="1" stop-color="#9b1a5a"/>
-        </linearGradient></defs>
-      </svg>
-    </div>
-    <div class="floater">
-      <svg viewBox="0 0 60 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="22" y="2" width="16" height="12" rx="2" fill="#d4a853" opacity="0.8"/>
-        <rect x="24" y="14" width="12" height="6" rx="1" fill="#d4a853" opacity="0.6"/>
-        <rect x="10" y="20" width="40" height="80" rx="8" fill="url(#b4)"/>
-        <rect x="10" y="88" width="40" height="30" rx="4" fill="#e8b4c0" opacity="0.9"/>
-        <rect x="14" y="24" width="8" height="40" rx="4" fill="white" opacity="0.2"/>
-        <defs><linearGradient id="b4" x1="10" y1="20" x2="50" y2="100" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#c48090"/><stop offset="1" stop-color="#e8b4c0"/>
-        </linearGradient></defs>
-      </svg>
-    </div>
-    <div class="floater">
-      <svg viewBox="0 0 60 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="22" y="2" width="16" height="12" rx="2" fill="#d4a853" opacity="0.8"/>
-        <rect x="24" y="14" width="12" height="6" rx="1" fill="#d4a853" opacity="0.6"/>
-        <rect x="10" y="20" width="40" height="80" rx="8" fill="url(#b5)"/>
-        <rect x="10" y="88" width="40" height="30" rx="4" fill="#1a1a3a" opacity="0.9"/>
-        <rect x="14" y="24" width="8" height="40" rx="4" fill="white" opacity="0.1"/>
-        <defs><linearGradient id="b5" x1="10" y1="20" x2="50" y2="100" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#0a0a1a"/><stop offset="1" stop-color="#2a2a5a"/>
-        </linearGradient></defs>
-      </svg>
-    </div>
+  <!-- ── CURSOR ── -->
+  <div id="cursor" aria-hidden="true">
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
   </div>
 
-  <div class="hero-content">
-    <p class="hero-eyebrow">Est. 2019 · Luxury Nail Care</p>
-    <h1 class="hero-title">
-      Your Nails,<br /><em>Perfected.</em>
-    </h1>
-    <p class="hero-subtitle">
-      Where science meets elegance — nail care elevated to an art form.
-    </p>
-    <div class="hero-actions">
-      <a href="#products" class="btn-primary">Explore Collection</a>
-      <a href="#about" class="btn-ghost">Our Story</a>
-    </div>
-  </div>
-
-  <div class="scroll-hint">
-    <div class="scroll-line"></div>
-    <span>Scroll</span>
-  </div>
-</section>
-
-<!-- Marquee -->
-<div class="marquee-wrap">
-  <div class="marquee-track">
-    <div class="marquee-item">Luxury Nail Polish <span>✦</span> Long-Wearing Formula <span>✦</span> Cruelty Free <span>✦</span> Vegan Ingredients <span>✦</span> Chip Resistant <span>✦</span> 50+ Shades <span>✦</span></div>
-    <div class="marquee-item">Luxury Nail Polish <span>✦</span> Long-Wearing Formula <span>✦</span> Cruelty Free <span>✦</span> Vegan Ingredients <span>✦</span> Chip Resistant <span>✦</span> 50+ Shades <span>✦</span></div>
-    <div class="marquee-item">Luxury Nail Polish <span>✦</span> Long-Wearing Formula <span>✦</span> Cruelty Free <span>✦</span> Vegan Ingredients <span>✦</span> Chip Resistant <span>✦</span> 50+ Shades <span>✦</span></div>
-  </div>
-</div>
-
-<!-- About -->
-<section id="about">
-  <div class="about-visual reveal-left">
-    <div class="about-card about-card-main">
-      <svg class="bottle-large" viewBox="0 0 120 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="44" y="4" width="32" height="24" rx="4" fill="#d4a853" opacity="0.9"/>
-        <rect x="48" y="28" width="24" height="12" rx="2" fill="#d4a853" opacity="0.7"/>
-        <rect x="20" y="40" width="80" height="160" rx="16" fill="url(#bottle-main)"/>
-        <rect x="20" y="185" width="80" height="55" rx="8" fill="#c1121f" opacity="0.95"/>
-        <rect x="28" y="48" width="16" height="80" rx="8" fill="white" opacity="0.12"/>
-        <rect x="20" y="40" width="80" height="160" rx="16" fill="url(#bottle-shine)" opacity="0.2"/>
-        <text x="60" y="220" text-anchor="middle" fill="white" opacity="0.6" font-size="9" font-family="serif" letter-spacing="2">RUBY NAILS</text>
-        <defs>
-          <linearGradient id="bottle-main" x1="20" y1="40" x2="100" y2="200" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#6b0f1f"/><stop offset="0.5" stop-color="#c1121f"/><stop offset="1" stop-color="#8b1a2a"/>
-          </linearGradient>
-          <linearGradient id="bottle-shine" x1="20" y1="40" x2="60" y2="200" gradientUnits="userSpaceOnUse">
-            <stop stop-color="white"/><stop offset="1" stop-color="transparent"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-    <div class="about-card about-card-accent">
-      <div class="about-stat">
-        <span class="about-stat-num" data-count="50">0</span>
-        <span class="about-stat-label">Signature Shades</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="about-text">
-    <p class="section-label reveal">Our Philosophy</p>
-    <h2 class="section-title reveal">
-      Beauty born from<br /><em>precision.</em>
-    </h2>
-    <p class="reveal">
-      Ruby Nails was founded on a single belief: that nail care should never be a compromise.
-      We obsessively formulate every product with premium, cruelty-free ingredients that
-      deliver salon-quality results at home.
-    </p>
-    <p class="reveal">
-      From our long-wearing base coats to our richly pigmented polishes, every bottle
-      carries our promise — nails that are as healthy as they are beautiful.
-    </p>
-    <div class="about-features">
-      <div class="about-feature reveal">
-        <div class="about-feature-name">Vegan Formula</div>
-        <p>100% animal-free ingredients, always.</p>
-      </div>
-      <div class="about-feature reveal">
-        <div class="about-feature-name">10-Free</div>
-        <p>Free from 10 harmful chemicals.</p>
-      </div>
-      <div class="about-feature reveal">
-        <div class="about-feature-name">Chip Resistant</div>
-        <p>Up to 14 days of flawless wear.</p>
-      </div>
-      <div class="about-feature reveal">
-        <div class="about-feature-name">Fast Dry</div>
-        <p>Set in 60 seconds, perfect every time.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Products -->
-<section id="products">
-  <div class="products-header">
-    <p class="section-label reveal">The Collection</p>
-    <h2 class="section-title reveal">Crafted for <em>every mood.</em></h2>
-  </div>
-  <div class="products-grid">
-
-    <div class="product-card reveal" data-tilt>
-      <div class="product-card-glow" style="background: radial-gradient(circle at var(--mx,50%) var(--my,50%), oklch(48% 0.24 18 / 0.12) 0%, transparent 60%)"></div>
-      <div class="product-badge">Bestseller</div>
-      <div class="product-swatch" style="background: radial-gradient(circle at 35% 35%, #e84040, #8b0000); color: oklch(35% 0.15 18 / 0.4)"></div>
-      <div class="product-name">Ruby Velvet</div>
-      <p class="product-desc">Our iconic deep crimson — rich, velvety, and impossibly bold. The shade that started it all.</p>
-      <div class="product-price">£24 <span>/ 12ml</span></div>
-      <a href="#" class="product-btn">Add to Bag</a>
-    </div>
-
-    <div class="product-card reveal" data-tilt>
-      <div class="product-card-glow" style="background: radial-gradient(circle at var(--mx,50%) var(--my,50%), oklch(74% 0.14 72 / 0.12) 0%, transparent 60%)"></div>
-      <div class="product-badge">New</div>
-      <div class="product-swatch" style="background: radial-gradient(circle at 35% 35%, #f0d080, #b8860b); color: oklch(55% 0.12 72 / 0.4)"></div>
-      <div class="product-name">Gold Dust</div>
-      <p class="product-desc">A shimmering metallic gold top coat that transforms any shade into liquid luxury.</p>
-      <div class="product-price">£26 <span>/ 12ml</span></div>
-      <a href="#" class="product-btn">Add to Bag</a>
-    </div>
-
-    <div class="product-card reveal" data-tilt>
-      <div class="product-card-glow" style="background: radial-gradient(circle at var(--mx,50%) var(--my,50%), oklch(65% 0.14 350 / 0.12) 0%, transparent 60%)"></div>
-      <div class="product-swatch" style="background: radial-gradient(circle at 35% 35%, #f0a0c0, #c06080); color: oklch(55% 0.12 350 / 0.4)"></div>
-      <div class="product-name">Rose Petal</div>
-      <p class="product-desc">A soft, feminine pink with a hint of warmth — effortlessly elegant for every occasion.</p>
-      <div class="product-price">£22 <span>/ 12ml</span></div>
-      <a href="#" class="product-btn">Add to Bag</a>
-    </div>
-
-    <div class="product-card reveal" data-tilt>
-      <div class="product-card-glow" style="background: radial-gradient(circle at var(--mx,50%) var(--my,50%), oklch(30% 0.12 300 / 0.15) 0%, transparent 60%)"></div>
-      <div class="product-badge">Limited</div>
-      <div class="product-swatch" style="background: radial-gradient(circle at 35% 35%, #5a2080, #2a0840); color: oklch(25% 0.15 300 / 0.4)"></div>
-      <div class="product-name">Midnight Plum</div>
-      <p class="product-desc">A moody, deep plum that commands attention — perfect for evenings that matter.</p>
-      <div class="product-price">£24 <span>/ 12ml</span></div>
-      <a href="#" class="product-btn">Add to Bag</a>
-    </div>
-
-    <div class="product-card reveal" data-tilt>
-      <div class="product-card-glow" style="background: radial-gradient(circle at var(--mx,50%) var(--my,50%), oklch(90% 0.02 60 / 0.1) 0%, transparent 60%)"></div>
-      <div class="product-swatch" style="background: radial-gradient(circle at 35% 35%, #f5e6d0, #e0c8a8); color: oklch(75% 0.04 60 / 0.4)"></div>
-      <div class="product-name">Champagne</div>
-      <p class="product-desc">A luminous nude with champagne undertones — the ultimate in understated sophistication.</p>
-      <div class="product-price">£22 <span>/ 12ml</span></div>
-      <a href="#" class="product-btn">Add to Bag</a>
-    </div>
-
-    <div class="product-card reveal" data-tilt>
-      <div class="product-card-glow" style="background: radial-gradient(circle at var(--mx,50%) var(--my,50%), oklch(40% 0.02 200 / 0.12) 0%, transparent 60%)"></div>
-      <div class="product-swatch" style="background: radial-gradient(circle at 35% 35%, rgba(200,220,230,0.9), rgba(140,170,190,0.8)); color: oklch(60% 0.05 200 / 0.4)"></div>
-      <div class="product-name">Crystal Clear</div>
-      <p class="product-desc">Our award-winning strengthening base & top coat — the foundation every nail ritual needs.</p>
-      <div class="product-price">£28 <span>/ 15ml</span></div>
-      <a href="#" class="product-btn">Add to Bag</a>
-    </div>
-
-  </div>
-</section>
-
-<!-- Ritual Steps -->
-<section id="ritual">
-  <p class="section-label reveal" style="text-align:center">The Method</p>
-  <h2 class="section-title reveal" style="text-align:center; max-width:500px; margin:0 auto">
-    The <em>four-step</em> ritual.
-  </h2>
-  <div class="ritual-grid">
-    <div class="ritual-step reveal">
-      <div class="ritual-num">01</div>
-      <svg class="ritual-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="24" cy="24" r="18"/>
-        <path d="M16 24c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8"/>
-        <path d="M24 32v4M20 28l-4 4"/>
-      </svg>
-      <div class="ritual-title">Cleanse & Prep</div>
-      <p class="ritual-desc">Begin with clean, dry nails. Remove any oils with our Prep Cleanser for maximum adhesion and a flawless finish.</p>
-    </div>
-    <div class="ritual-step reveal">
-      <div class="ritual-num">02</div>
-      <svg class="ritual-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="10" y="8" width="28" height="32" rx="6"/>
-        <path d="M18 8v4M30 8v4"/>
-        <path d="M16 20h16M16 28h10"/>
-      </svg>
-      <div class="ritual-title">Base Coat</div>
-      <p class="ritual-desc">Apply one thin coat of Crystal Clear Base. This creates a protective layer that prevents staining and extends wear.</p>
-    </div>
-    <div class="ritual-step reveal">
-      <div class="ritual-num">03</div>
-      <svg class="ritual-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M24 8C15.2 8 8 15.2 8 24s7.2 16 16 16 16-7.2 16-16S32.8 8 24 8z"/>
-        <path d="M24 16v8l6 4"/>
-      </svg>
-      <div class="ritual-title">Colour</div>
-      <p class="ritual-desc">Apply two thin coats of your chosen shade, allowing 60 seconds between coats for that flawless, streak-free finish.</p>
-    </div>
-    <div class="ritual-step reveal">
-      <div class="ritual-num">04</div>
-      <svg class="ritual-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M8 24l10 10 22-22"/>
-      </svg>
-      <div class="ritual-title">Seal & Shine</div>
-      <p class="ritual-desc">Finish with Gold Dust Top Coat to lock in colour and add a mirror-like shine. Your nails, perfected for up to 14 days.</p>
-    </div>
-  </div>
-</section>
-
-<!-- Stats -->
-<section id="stats">
-  <div class="stats-grid">
-    <div class="reveal">
-      <span class="stat-num"><span class="counter" data-target="250">0</span><span class="stat-unit">k+</span></span>
-      <span class="stat-label">Happy Customers</span>
-    </div>
-    <div class="reveal">
-      <span class="stat-num"><span class="counter" data-target="50">0</span><span class="stat-unit">+</span></span>
-      <span class="stat-label">Signature Shades</span>
-    </div>
-    <div class="reveal">
-      <span class="stat-num"><span class="counter" data-target="14">0</span><span class="stat-unit"> days</span></span>
-      <span class="stat-label">Guaranteed Wear</span>
-    </div>
-    <div class="reveal">
-      <span class="stat-num"><span class="counter" data-target="10">0</span><span class="stat-unit">-Free</span></span>
-      <span class="stat-label">Harmful Chemicals</span>
-    </div>
-  </div>
-</section>
-
-<!-- Testimonials -->
-<section id="testimonials">
-  <div class="testimonials-header">
-    <p class="section-label reveal">Reviews</p>
-    <h2 class="section-title reveal">Loved by <em>thousands.</em></h2>
-  </div>
-  <div style="overflow:hidden" id="t-viewport">
-    <div class="testimonials-track" id="t-track">
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <p class="testimonial-text">"I've tried every nail brand out there, and Ruby Nails is in a completely different league. Ruby Velvet lasted two full weeks without a single chip. Absolutely obsessed."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">S</div>
-          <div>
-            <div class="author-name">Sophia C.</div>
-            <div class="author-handle">London, UK · Verified Buyer</div>
-          </div>
+  <!-- ── MODAL ── -->
+  <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-product-name"></div>
+  <div id="product-modal">
+    <button class="modal-close" id="modal-close-btn" aria-label="Close">✕</button>
+    <div class="modal-handle"></div>
+    <div class="modal-inner">
+      <div class="modal-visual" id="modal-visual"></div>
+      <div class="modal-body">
+        <span class="modal-badge" id="modal-badge">Bestseller</span>
+        <h2 class="modal-name" id="modal-product-name">Ruby Velvet</h2>
+        <p class="modal-tagline" id="modal-tagline">Deep, dramatic, unforgettable.</p>
+        <p class="modal-desc" id="modal-desc">A rich, full-coverage formula in our most-loved shade. Long-wear, chip-resistant, and infused with vitamin E for nails that look as good as they feel.</p>
+        <div class="modal-swatches-label">Choose shade</div>
+        <div class="modal-swatches" id="modal-swatches"></div>
+        <div class="modal-price-row">
+          <span class="modal-price" id="modal-price">£24</span>
+          <span class="modal-price-original" id="modal-orig"></span>
         </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <p class="testimonial-text">"The Gold Dust top coat is genuinely life-changing. I put it over Rose Petal and got so many compliments I lost count. The formula is just exceptional."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">A</div>
-          <div>
-            <div class="author-name">Amelie R.</div>
-            <div class="author-handle">Paris, FR · Verified Buyer</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <p class="testimonial-text">"Finally a luxury nail brand that's actually cruelty-free AND performs. My nails have never looked healthier. The Crystal Clear strengthener is a must."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">J</div>
-          <div>
-            <div class="author-name">Jessica M.</div>
-            <div class="author-handle">New York, US · Verified Buyer</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <p class="testimonial-text">"Midnight Plum is exactly what I've been searching for — not too dark, not too bright. It's sophisticated perfection. The packaging alone makes it feel like a real treat."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">L</div>
-          <div>
-            <div class="author-name">Luna T.</div>
-            <div class="author-handle">Milan, IT · Verified Buyer</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-stars">★★★★★</div>
-        <p class="testimonial-text">"I was sceptical about £24 nail polish but these genuinely last twice as long as anything else I've tried. The Champagne shade is my everyday go-to — flawless."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">E</div>
-          <div>
-            <div class="author-name">Emma W.</div>
-            <div class="author-handle">Edinburgh, UK · Verified Buyer</div>
-          </div>
-        </div>
+        <button class="modal-add-btn" id="modal-add-btn">Add to Bag — <span id="modal-price-btn">£24</span></button>
       </div>
     </div>
   </div>
-  <div class="testimonials-nav" id="t-nav">
-    <div class="t-dot active"></div>
-    <div class="t-dot"></div>
-    <div class="t-dot"></div>
-    <div class="t-dot"></div>
-    <div class="t-dot"></div>
-  </div>
-</section>
 
-<!-- CTA -->
-<section id="cta">
-  <p class="section-label reveal">Join the Club</p>
-  <h2 class="cta-title reveal">Your nails deserve <em>the best.</em></h2>
-  <p class="cta-sub reveal">Be first to discover new shades, exclusive offers, and nail care secrets.</p>
-  <form class="cta-form reveal" onsubmit="return false">
-    <input class="cta-input" type="email" placeholder="your@email.com" />
-    <button class="cta-submit" type="submit">Join</button>
-  </form>
-  <p class="cta-promise reveal">No spam. Unsubscribe anytime. We treat your inbox like your nails — with care.</p>
-</section>
-
-<!-- Footer -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <div class="footer-logo">Ruby<span>.</span>Nails</div>
-      <p class="footer-tagline">Where beauty meets precision.</p>
-      <div class="footer-social">
-        <a href="#" class="social-btn" title="Instagram">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
-        </a>
-        <a href="#" class="social-btn" title="TikTok">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
-        </a>
-        <a href="#" class="social-btn" title="Pinterest">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.236 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.181-.78 1.172-4.97 1.172-4.97s-.299-.598-.299-1.482c0-1.388.806-2.428 1.808-2.428.852 0 1.265.64 1.265 1.408 0 .858-.546 2.14-.828 3.33-.236.995.499 1.806 1.476 1.806 1.772 0 3.137-1.867 3.137-4.561 0-2.386-1.715-4.054-4.163-4.054-2.836 0-4.5 2.127-4.5 4.326 0 .856.33 1.775.741 2.276a.3.3 0 0 1 .069.286c-.076.31-.244.995-.277 1.134-.044.183-.146.222-.337.134-1.249-.581-2.03-2.407-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.473 6.165 5.776 0 3.447-2.173 6.22-5.19 6.22-1.013 0-1.966-.527-2.292-1.148l-.623 2.378c-.226.869-.835 1.958-1.244 2.621.937.29 1.931.446 2.962.446 5.522 0 10-4.477 10-10S17.522 2 12 2z"/></svg>
-        </a>
-      </div>
-    </div>
-    <div>
-      <div class="footer-col-title">Shop</div>
-      <ul class="footer-links">
-        <li><a href="#">All Products</a></li>
-        <li><a href="#">Polish Collection</a></li>
-        <li><a href="#">Base & Top Coats</a></li>
-        <li><a href="#">Gift Sets</a></li>
-        <li><a href="#">New Arrivals</a></li>
+  <main>
+    <!-- ── NAV ── -->
+    <nav id="main-nav">
+      <span class="nav-logo">Ruby Nails</span>
+      <ul class="nav-links">
+        <li><a href="#products">Shop</a></li>
+        <li><a href="#ritual">Ritual</a></li>
+        <li><a href="#lookbook">Lookbook</a></li>
+        <li><a href="#about">Our Story</a></li>
       </ul>
+      <button class="nav-cta">Shop Now</button>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <section class="hero" aria-label="Hero">
+      <p class="hero-eyebrow">Luxury Nail Care — Est. 2018</p>
+      <h1 class="hero-title">
+        <span class="line-ruby">Ruby</span>
+        <span class="line-nails">Nails</span>
+      </h1>
+      <p class="hero-sub">Where science meets beauty. Colour that lasts, nails that glow.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="scrollToSection('products')">Explore Collection</button>
+        <button class="btn-outline" onclick="scrollToSection('ritual')">Our Ritual</button>
+      </div>
+      <div class="hero-bottles">
+        <!-- Bottle SVGs -->
+        <div class="bottle-wrap" style="animation: float1 4.5s ease-in-out infinite;">
+          <span class="bottle-badge">New</span>
+          <svg width="80" height="200" viewBox="0 0 80 200">
+            <defs>
+              <linearGradient id="b1g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="oklch(55% 0.28 18)"/>
+                <stop offset="100%" stop-color="oklch(40% 0.22 18)"/>
+              </linearGradient>
+            </defs>
+            <rect x="28" y="0" width="24" height="28" rx="4" fill="oklch(74% 0.14 72)"/>
+            <rect x="24" y="22" width="32" height="12" rx="4" fill="oklch(85% 0.12 72)"/>
+            <rect x="16" y="34" width="48" height="140" rx="10" fill="url(#b1g)"/>
+            <rect x="20" y="50" width="12" height="110" rx="6" fill="oklch(65% 0.20 18)" opacity="0.3"/>
+          </svg>
+        </div>
+        <div class="bottle-wrap" style="animation: float2 5.2s ease-in-out infinite; transform: scale(1.2);">
+          <svg width="80" height="200" viewBox="0 0 80 200">
+            <defs>
+              <linearGradient id="b2g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="oklch(78% 0.17 72)"/>
+                <stop offset="100%" stop-color="oklch(65% 0.14 72)"/>
+              </linearGradient>
+            </defs>
+            <rect x="28" y="0" width="24" height="28" rx="4" fill="oklch(25% 0.04 355)"/>
+            <rect x="24" y="22" width="32" height="12" rx="4" fill="oklch(35% 0.05 355)"/>
+            <rect x="16" y="34" width="48" height="140" rx="10" fill="url(#b2g)"/>
+            <rect x="20" y="50" width="12" height="110" rx="6" fill="white" opacity="0.2"/>
+          </svg>
+        </div>
+        <div class="bottle-wrap" style="animation: float3 3.8s ease-in-out infinite;">
+          <svg width="80" height="200" viewBox="0 0 80 200">
+            <defs>
+              <linearGradient id="b3g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="oklch(68% 0.30 345)"/>
+                <stop offset="100%" stop-color="oklch(55% 0.25 345)"/>
+              </linearGradient>
+            </defs>
+            <rect x="28" y="0" width="24" height="28" rx="4" fill="oklch(30% 0.04 355)"/>
+            <rect x="24" y="22" width="32" height="12" rx="4" fill="oklch(40% 0.05 355)"/>
+            <rect x="16" y="34" width="48" height="140" rx="10" fill="url(#b3g)"/>
+            <rect x="20" y="50" width="12" height="110" rx="6" fill="white" opacity="0.2"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MARQUEE ── -->
+    <div class="marquee-strip" aria-hidden="true">
+      <div class="marquee-track">
+        <span class="marquee-item"><span class="marquee-dot"></span> Long-Wear Formula</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Cruelty Free</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Vegan Certified</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Chip Resistant</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Vitamin E Enriched</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> 100+ Shades</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Award Winning</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Dermatologist Tested</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Long-Wear Formula</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Cruelty Free</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Vegan Certified</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Chip Resistant</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Vitamin E Enriched</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> 100+ Shades</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Award Winning</span>
+        <span class="marquee-item"><span class="marquee-dot"></span> Dermatologist Tested</span>
+      </div>
     </div>
-    <div>
-      <div class="footer-col-title">Company</div>
-      <ul class="footer-links">
-        <li><a href="#">Our Story</a></li>
-        <li><a href="#">Ingredients</a></li>
-        <li><a href="#">Sustainability</a></li>
-        <li><a href="#">Press</a></li>
-        <li><a href="#">Careers</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Help</div>
-      <ul class="footer-links">
-        <li><a href="#">FAQ</a></li>
-        <li><a href="#">Shipping & Returns</a></li>
-        <li><a href="#">Track Order</a></li>
-        <li><a href="#">Contact Us</a></li>
-        <li><a href="#">Wholesale</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span class="footer-copy">© 2026 Ruby Nails Ltd. All rights reserved.</span>
-    <div class="footer-legal">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Cookie Settings</a>
-    </div>
-  </div>
-</footer>
 
-<script>
-  gsap.registerPlugin(ScrollTrigger);
+    <!-- ── PRESS ── -->
+    <section class="press reveal">
+      <p class="press-label">As seen in</p>
+      <div class="press-logos">
+        <span class="press-logo">Vogue</span>
+        <span class="press-logo">Elle</span>
+        <span class="press-logo">Harper's Bazaar</span>
+        <span class="press-logo">Cosmopolitan</span>
+        <span class="press-logo">Glamour</span>
+        <span class="press-logo">Refinery29</span>
+      </div>
+    </section>
 
-  // ── CURSOR ──
-  const dot = document.getElementById('cursor-dot');
-  const ring = document.getElementById('cursor-ring');
-  let mx = 0, my = 0, rx = 0, ry = 0;
+    <!-- ── ABOUT ── -->
+    <section class="about" id="about">
+      <div class="about-visual reveal-left">
+        <div class="about-visual-bg"></div>
+        <div class="about-visual-svgs">
+          <svg width="200" height="320" viewBox="0 0 200 320">
+            <defs>
+              <radialGradient id="abg" cx="50%" cy="30%">
+                <stop offset="0%" stop-color="oklch(65% 0.20 18)" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="oklch(40% 0.22 18)" stop-opacity="0.1"/>
+              </radialGradient>
+            </defs>
+            <rect x="70" y="0" width="60" height="70" rx="12" fill="oklch(74% 0.14 72)" opacity="0.9"/>
+            <rect x="62" y="60" width="76" height="30" rx="10" fill="oklch(84% 0.12 72)" opacity="0.8"/>
+            <rect x="44" y="88" width="112" height="200" rx="22" fill="url(#abg)"/>
+            <rect x="55" y="120" width="30" height="150" rx="15" fill="white" opacity="0.1"/>
+          </svg>
+        </div>
+        <div class="about-visual-border"></div>
+        <div class="about-tag">
+          <div class="about-tag-num">5★</div>
+          <div class="about-tag-text">Average Rating</div>
+        </div>
+      </div>
+      <div class="about-text reveal-right">
+        <h2>Born from a <em>passion</em> for perfection</h2>
+        <p>Ruby Nails began in a small London studio with one idea: nail colour shouldn't compromise. Our founder spent three years perfecting a formula that lasts up to 14 days without chipping, looks salon-fresh, and nourishes while it wears.</p>
+        <p>Today, we're the UK's fastest-growing nail care brand — trusted by professional manicurists and home artists alike. Every shade is cruelty-free, vegan, and made in our certified British facility.</p>
+        <div class="about-stats">
+          <div class="stat-box reveal">
+            <div class="stat-num" data-count="250">0</div>
+            <div class="stat-label">Shades Available</div>
+          </div>
+          <div class="stat-box reveal">
+            <div class="stat-num" data-count="180">0</div>
+            <div class="stat-label">k Happy Customers</div>
+          </div>
+          <div class="stat-box reveal">
+            <div class="stat-num" data-count="14">0</div>
+            <div class="stat-label">Day Wear Formula</div>
+          </div>
+          <div class="stat-box reveal">
+            <div class="stat-num" data-count="6">0</div>
+            <div class="stat-label">Awards Won</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    gsap.to(dot, { x: mx, y: my, duration: 0.05 });
-  });
+    <!-- ── PRODUCTS ── -->
+    <section class="products" id="products">
+      <div class="section-header reveal">
+        <span class="section-eyebrow">The Collection</span>
+        <h2 class="section-title">Every shade, a <span>statement</span></h2>
+        <p class="section-sub">Nine curated colours. Each one obsessively formulated to last, glow, and turn heads.</p>
+      </div>
+      <div class="product-grid" id="product-grid"></div>
+    </section>
 
-  (function animRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.transform = `translate(${rx - 20}px, ${ry - 20}px)`;
-    requestAnimationFrame(animRing);
-  })();
+    <!-- ── FORMULA ── -->
+    <section class="formula" id="formula">
+      <div class="formula-grid">
+        <div class="reveal-left">
+          <span class="section-eyebrow">The Science</span>
+          <h2 class="section-title" style="font-size:clamp(2rem,4vw,3.5rem);margin-bottom:1.5rem;">A formula you can <span>trust</span></h2>
+          <p style="color:var(--muted);margin-bottom:2rem;">Every Ruby Nails formula starts in our London lab. We obsess over ingredient quality, testing each batch for adhesion, flexibility, and nail health before it reaches you.</p>
+          <div class="formula-badges">
+            <span class="formula-badge active">10-Free</span>
+            <span class="formula-badge">Vegan</span>
+            <span class="formula-badge">Cruelty-Free</span>
+            <span class="formula-badge">PETA Approved</span>
+            <span class="formula-badge">UK Made</span>
+            <span class="formula-badge">Long Wear</span>
+          </div>
+          <ul class="formula-ingredients">
+            <li>
+              <span class="ingredient-icon">🌹</span>
+              <div>
+                <div class="ingredient-name">Rose Hip Oil</div>
+                <div class="ingredient-desc">Deeply nourishes, strengthens nail structure, and prevents brittleness.</div>
+              </div>
+            </li>
+            <li>
+              <span class="ingredient-icon">✨</span>
+              <div>
+                <div class="ingredient-name">Vitamin E Complex</div>
+                <div class="ingredient-desc">Antioxidant protection that keeps nails hydrated and healthy under the colour.</div>
+              </div>
+            </li>
+            <li>
+              <span class="ingredient-icon">💎</span>
+              <div>
+                <div class="ingredient-name">Diamond Powder</div>
+                <div class="ingredient-desc">Creates an unmatched glass-shine finish that catches light from every angle.</div>
+              </div>
+            </li>
+            <li>
+              <span class="ingredient-icon">🌿</span>
+              <div>
+                <div class="ingredient-name">Biotin Boost</div>
+                <div class="ingredient-desc">Promotes nail growth and resilience for nails that grow long and strong.</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="formula-visual reveal-right">
+          <div class="formula-circle">
+            <div class="formula-circle-inner">
+              <div class="formula-circle-num">10</div>
+              <div class="formula-circle-text">Free</div>
+            </div>
+          </div>
+          <div class="formula-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:var(--ruby)"></span>Colour Pigments (35%)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Shine Agents (20%)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--pink)"></span>Nourishing Oils (15%)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>Adhesion Complex (15%)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--coral)"></span>Strengtheners (15%)</div>
+          </div>
+          <div style="background:var(--surface-hi);border-radius:1rem;padding:1.25rem;">
+            <div style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">Clinical Results</div>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;"><span>Chip resistance</span><span style="color:var(--gold)">97%</span></div>
+                <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:97%;background:linear-gradient(90deg,var(--ruby),var(--gold));border-radius:2px;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;"><span>Shine retention</span><span style="color:var(--gold)">94%</span></div>
+                <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:94%;background:linear-gradient(90deg,var(--ruby),var(--pink));border-radius:2px;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;"><span>Nail health improvement</span><span style="color:var(--gold)">89%</span></div>
+                <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:89%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:2px;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  document.querySelectorAll('a, button, [data-tilt], .t-dot').forEach(el => {
-    el.addEventListener('mouseenter', () => ring.classList.add('hovering'));
-    el.addEventListener('mouseleave', () => ring.classList.remove('hovering'));
-  });
+    <!-- ── RITUAL ── -->
+    <section class="ritual" id="ritual">
+      <div class="section-header reveal">
+        <span class="section-eyebrow">The Ritual</span>
+        <h2 class="section-title">Four steps to <span>perfection</span></h2>
+        <p class="section-sub">Our signature application ritual gives you salon-quality results at home, every time.</p>
+      </div>
+      <div class="ritual-steps">
+        <div class="ritual-step reveal">
+          <div class="step-num">01</div>
+          <div class="step-icon">✨</div>
+          <h3 class="step-title">Prep & Cleanse</h3>
+          <p class="step-desc">Shape, buff, and cleanse nails with our Prep Oil Remover to ensure a perfectly clean surface for maximum adhesion.</p>
+        </div>
+        <div class="ritual-step reveal">
+          <div class="step-num">02</div>
+          <div class="step-icon">💅</div>
+          <h3 class="step-title">Base Coat</h3>
+          <p class="step-desc">Apply our fortifying Base Coat in one thin layer. It locks in nourishment and creates the perfect adhesion foundation.</p>
+        </div>
+        <div class="ritual-step reveal">
+          <div class="step-num">03</div>
+          <div class="step-icon">🎨</div>
+          <h3 class="step-title">Colour — Two Coats</h3>
+          <p class="step-desc">Apply two thin layers of your chosen shade. Thin coats dry faster and last far longer than a single thick application.</p>
+        </div>
+        <div class="ritual-step reveal">
+          <div class="step-num">04</div>
+          <div class="step-icon">💎</div>
+          <h3 class="step-title">Top Coat Seal</h3>
+          <p class="step-desc">Finish with our Crystal Top Coat for a mirror-glass shine and maximum chip protection for up to 14 days.</p>
+        </div>
+      </div>
+    </section>
 
-  // ── NAV ──
-  const nav = document.getElementById('nav');
-  window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 80);
-  }, { passive: true });
+    <!-- ── LOOKBOOK ── -->
+    <section class="lookbook" id="lookbook">
+      <div class="section-header reveal">
+        <span class="section-eyebrow">Lookbook</span>
+        <h2 class="section-title">Colour in <span>context</span></h2>
+        <p class="section-sub">Five moods. Five moments. One formula.</p>
+      </div>
+      <div class="lookbook-grid">
+        <div class="lookbook-item tall reveal-left">
+          <div class="lookbook-swatch l1">
+            <svg width="100" height="260" viewBox="0 0 100 260">
+              <defs><linearGradient id="lbg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="oklch(60% 0.28 18)"/><stop offset="100%" stop-color="oklch(42% 0.24 18)"/></linearGradient></defs>
+              <rect x="35" y="0" width="30" height="40" rx="6" fill="oklch(74% 0.14 72)" opacity="0.8"/>
+              <rect x="28" y="35" width="44" height="16" rx="6" fill="oklch(80% 0.12 72)" opacity="0.7"/>
+              <rect x="18" y="50" width="64" height="190" rx="16" fill="url(#lbg1)"/>
+              <rect x="26" y="75" width="18" height="150" rx="9" fill="white" opacity="0.12"/>
+            </svg>
+            <div class="lookbook-label">Ruby Velvet</div>
+            <div class="lookbook-sub">Evening Drama</div>
+          </div>
+          <div class="lookbook-item-overlay"></div>
+        </div>
+        <div class="lookbook-item reveal">
+          <div class="lookbook-swatch l2">
+            <svg width="70" height="160" viewBox="0 0 70 160">
+              <defs><linearGradient id="lbg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="oklch(78% 0.17 72)"/><stop offset="100%" stop-color="oklch(62% 0.14 72)"/></linearGradient></defs>
+              <rect x="24" y="0" width="22" height="28" rx="5" fill="oklch(25% 0.04 355)" opacity="0.8"/>
+              <rect x="18" y="24" width="34" height="12" rx="5" fill="oklch(35% 0.05 355)" opacity="0.7"/>
+              <rect x="10" y="34" width="50" height="118" rx="12" fill="url(#lbg2)"/>
+              <rect x="17" y="55" width="14" height="90" rx="7" fill="white" opacity="0.15"/>
+            </svg>
+            <div class="lookbook-label">Gold Dust</div>
+            <div class="lookbook-sub">Daytime Gleam</div>
+          </div>
+          <div class="lookbook-item-overlay"></div>
+        </div>
+        <div class="lookbook-item reveal">
+          <div class="lookbook-swatch l3">
+            <svg width="70" height="160" viewBox="0 0 70 160">
+              <defs><linearGradient id="lbg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="oklch(70% 0.30 345)"/><stop offset="100%" stop-color="oklch(52% 0.26 345)"/></linearGradient></defs>
+              <rect x="24" y="0" width="22" height="28" rx="5" fill="oklch(74% 0.14 72)" opacity="0.8"/>
+              <rect x="18" y="24" width="34" height="12" rx="5" fill="oklch(84% 0.12 72)" opacity="0.7"/>
+              <rect x="10" y="34" width="50" height="118" rx="12" fill="url(#lbg3)"/>
+              <rect x="17" y="55" width="14" height="90" rx="7" fill="white" opacity="0.15"/>
+            </svg>
+            <div class="lookbook-label">Coral Reef</div>
+            <div class="lookbook-sub">Weekend Brunch</div>
+          </div>
+          <div class="lookbook-item-overlay"></div>
+        </div>
+        <div class="lookbook-item reveal">
+          <div class="lookbook-swatch l4">
+            <svg width="70" height="160" viewBox="0 0 70 160">
+              <defs><linearGradient id="lbg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="oklch(60% 0.26 300)"/><stop offset="100%" stop-color="oklch(42% 0.22 300)"/></linearGradient></defs>
+              <rect x="24" y="0" width="22" height="28" rx="5" fill="oklch(74% 0.14 72)" opacity="0.8"/>
+              <rect x="18" y="24" width="34" height="12" rx="5" fill="oklch(84% 0.12 72)" opacity="0.7"/>
+              <rect x="10" y="34" width="50" height="118" rx="12" fill="url(#lbg4)"/>
+              <rect x="17" y="55" width="14" height="90" rx="7" fill="white" opacity="0.15"/>
+            </svg>
+            <div class="lookbook-label">Midnight Plum</div>
+            <div class="lookbook-sub">Night Out</div>
+          </div>
+          <div class="lookbook-item-overlay"></div>
+        </div>
+        <div class="lookbook-item reveal">
+          <div class="lookbook-swatch l5">
+            <svg width="70" height="160" viewBox="0 0 70 160">
+              <defs><linearGradient id="lbg5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="oklch(70% 0.24 35)"/><stop offset="100%" stop-color="oklch(55% 0.20 35)"/></linearGradient></defs>
+              <rect x="24" y="0" width="22" height="28" rx="5" fill="oklch(25% 0.04 355)" opacity="0.8"/>
+              <rect x="18" y="24" width="34" height="12" rx="5" fill="oklch(35% 0.05 355)" opacity="0.7"/>
+              <rect x="10" y="34" width="50" height="118" rx="12" fill="url(#lbg5)"/>
+              <rect x="17" y="55" width="14" height="90" rx="7" fill="white" opacity="0.15"/>
+            </svg>
+            <div class="lookbook-label">Cherry Bomb</div>
+            <div class="lookbook-sub">Bold &amp; Fearless</div>
+          </div>
+          <div class="lookbook-item-overlay"></div>
+        </div>
+      </div>
+    </section>
 
-  // ── HERO ENTRANCE ──
-  const heroTl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-  heroTl
-    .to('.hero-eyebrow', { opacity: 1, y: 0, duration: 1, delay: 0.3 })
-    .to('.hero-title',   { opacity: 1, duration: 1.2 }, '-=0.6')
-    .to('.hero-subtitle',{ opacity: 1, y: 0, duration: 1 }, '-=0.8')
-    .to('.hero-actions', { opacity: 1, y: 0, duration: 0.8 }, '-=0.6')
-    .to('.scroll-hint',  { opacity: 1, duration: 0.6 }, '-=0.4');
+    <!-- ── TESTIMONIALS ── -->
+    <section class="testimonials">
+      <div class="section-header reveal">
+        <span class="section-eyebrow">Reviews</span>
+        <h2 class="section-title">What they're <span>saying</span></h2>
+      </div>
+      <div class="testimonials-carousel" id="testimonials-carousel">
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">Still flawless after 12 days. I've never had a polish last this long without chipping — and it looks salon-fresh. I'm obsessed with Ruby Velvet.</p>
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">SL</div>
+            <div><div class="author-name">Sophie Lambert</div><div class="author-handle">@sophie.nails</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">Gold Dust is everything. The shimmer is absolutely stunning and the formula goes on like a dream. This is luxury nail care done right.</p>
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">CR</div>
+            <div><div class="author-name">Charlotte Reid</div><div class="author-handle">@charlottebeauty</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">As a nail tech I'm incredibly picky about polish. Ruby Nails is the only brand I stock in my salon. My clients constantly ask what I'm using.</p>
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">MH</div>
+            <div><div class="author-name">Mia Harper</div><div class="author-handle">Nail Artist, London</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">Midnight Plum is the deepest, richest purple I've ever seen. The colour payoff in one coat is remarkable. Now I need every shade.</p>
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">JW</div>
+            <div><div class="author-name">Jessica Wu</div><div class="author-handle">@jessicawunails</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">Cherry Bomb makes me feel like a different person. It's the boldest red I've ever worn and I get compliments every single day.</p>
+          <div class="testimonial-stars">★★★★★</div>
+          <div class="testimonial-author">
+            <div class="author-avatar">AT</div>
+            <div><div class="author-name">Aria Thompson</div><div class="author-handle">@ariastyle</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-controls">
+        <button class="carousel-btn" id="carousel-prev" aria-label="Previous">←</button>
+        <button class="carousel-btn" id="carousel-next" aria-label="Next">→</button>
+      </div>
+    </section>
 
-  // ── SCROLL REVEALS ──
-  gsap.utils.toArray('.reveal').forEach(el => {
-    gsap.fromTo(el,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
-      }
-    );
-  });
-  gsap.utils.toArray('.reveal-left').forEach(el => {
-    gsap.fromTo(el,
-      { opacity: 0, x: -60 },
-      { opacity: 1, x: 0, duration: 1, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
-      }
-    );
-  });
-  gsap.utils.toArray('.reveal-right').forEach(el => {
-    gsap.fromTo(el,
-      { opacity: 0, x: 60 },
-      { opacity: 1, x: 0, duration: 1, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
-      }
-    );
-  });
+    <!-- ── FAQ ── -->
+    <section class="faq">
+      <div class="section-header reveal" style="text-align:left;margin-bottom:3rem;">
+        <span class="section-eyebrow">FAQ</span>
+        <h2 class="section-title">Everything you <span>need to know</span></h2>
+      </div>
+      <div id="faq-list"></div>
+    </section>
 
-  // ── HERO PARALLAX ──
-  gsap.to('.hero-bg', {
-    yPercent: 30,
-    ease: 'none',
-    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
-  });
-  gsap.to('.floaters', {
-    yPercent: 20,
-    ease: 'none',
-    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
-  });
+    <!-- ── CTA ── -->
+    <section class="cta-section">
+      <div class="cta-glow"></div>
+      <h2 class="cta-title reveal">Join the <span>Ruby</span> club</h2>
+      <p class="cta-sub reveal">Be first to discover new shades, exclusive offers, and nail care secrets from our London studio.</p>
+      <form class="cta-form reveal" onsubmit="handleCtaSubmit(event)">
+        <input class="cta-input" type="email" placeholder="your@email.com" required aria-label="Email address" />
+        <button class="cta-submit" type="submit">Join Now</button>
+      </form>
+      <p class="cta-privacy reveal">No spam, ever. Unsubscribe anytime. We promise.</p>
+    </section>
 
-  // ── COUNTERS ──
-  gsap.utils.toArray('.counter').forEach(el => {
-    const target = parseInt(el.dataset.target, 10);
-    ScrollTrigger.create({
-      trigger: el, start: 'top 85%',
-      onEnter: () => {
-        gsap.to({ val: 0 }, {
-          val: target, duration: 2, ease: 'power2.out',
-          onUpdate() { el.textContent = Math.round(this.targets()[0].val); }
-        });
-      }
-    });
-  });
+    <!-- ── FOOTER ── -->
+    <footer>
+      <div class="footer-brand">
+        <span class="nav-logo footer-logo-text">Ruby Nails</span>
+        <p>Luxury nail care crafted in London. Where science meets beauty and every shade is a statement.</p>
+        <div class="footer-socials">
+          <a class="social-link" href="#" aria-label="Instagram">ig</a>
+          <a class="social-link" href="#" aria-label="TikTok">tt</a>
+          <a class="social-link" href="#" aria-label="Pinterest">pt</a>
+          <a class="social-link" href="#" aria-label="YouTube">yt</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#">New Arrivals</a></li>
+          <li><a href="#">Bestsellers</a></li>
+          <li><a href="#">Sets & Kits</a></li>
+          <li><a href="#">Base & Top Coats</a></li>
+          <li><a href="#">Nail Care</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Shipping</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Store Locator</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="#">Our Story</a></li>
+          <li><a href="#">Sustainability</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Stockists</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Ruby Nails Ltd. All rights reserved.</span>
+        <span>Made with love in London &nbsp;🇬🇧</span>
+      </div>
+    </footer>
+  </main>
 
-  // ── ABOUT STAT COUNTER ──
-  ScrollTrigger.create({
-    trigger: '.about-stat-num', start: 'top 85%',
-    onEnter: () => {
-      const el = document.querySelector('.about-stat-num');
-      gsap.to({ val: 0 }, {
-        val: 50, duration: 2, ease: 'power2.out',
-        onUpdate() { el.textContent = Math.round(this.targets()[0].val); }
-      });
+  <style>
+    @keyframes float1 { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-22px) rotate(3deg)} }
+    @keyframes float2 { 0%,100%{transform:scale(1.2) translateY(-8px)} 50%{transform:scale(1.2) translateY(18px)} }
+    @keyframes float3 { 0%,100%{transform:translateY(0) rotate(4deg)} 50%{transform:translateY(-16px) rotate(-4deg)} }
+  </style>
+
+  <script>
+    // ── PRODUCTS DATA ──
+    const PRODUCTS = [
+      {
+        id: 'ruby-velvet',
+        name: 'Ruby Velvet',
+        tagline: 'Deep, dramatic, unforgettable.',
+        desc: 'Our signature shade in a velvety matte-satin finish. Rich pigment, flawless coverage, and 14-day wear make this the cornerstone of any nail collection.',
+        price: 24, badge: 'Bestseller',
+        glowColor: 'oklch(52% 0.28 18 / 0.25)',
+        bottleGrad: ['oklch(58% 0.28 18)', 'oklch(40% 0.22 18)'],
+        swatches: ['#b81c3a','#8f1530','#c73d55','#d96b80'],
+      },
+      {
+        id: 'gold-dust',
+        name: 'Gold Dust',
+        tagline: 'Luminous, metallic, mesmerising.',
+        desc: 'A shimmering metallic gold that catches every flicker of light. Our micro-pearl formula creates depth and dimension unlike any other gold polish.',
+        price: 26, badge: 'New',
+        glowColor: 'oklch(78% 0.17 72 / 0.25)',
+        bottleGrad: ['oklch(80% 0.17 72)', 'oklch(65% 0.14 72)'],
+        swatches: ['#c9a84c','#b8933d','#d4b870','#e0cc9a'],
+      },
+      {
+        id: 'rose-petal',
+        name: 'Rose Petal',
+        tagline: 'Soft, romantic, effortlessly feminine.',
+        desc: 'A delicate blush-rose that works for every skin tone. The sheer-to-full buildable formula lets you choose your level of coverage — from barely-there to bold.',
+        price: 22,
+        glowColor: 'oklch(80% 0.15 0 / 0.2)',
+        bottleGrad: ['oklch(82% 0.14 0)', 'oklch(70% 0.12 355)'],
+        swatches: ['#e8a0a0','#d98080','#f0bebe','#c87070'],
+      },
+      {
+        id: 'midnight-plum',
+        name: 'Midnight Plum',
+        tagline: 'Mysterious, rich, and utterly seductive.',
+        desc: 'A deep, jewel-toned plum that shifts between purple and aubergine in different lights. One coat gives full, opaque coverage with a high-gloss finish.',
+        price: 24,
+        glowColor: 'oklch(55% 0.26 300 / 0.25)',
+        bottleGrad: ['oklch(58% 0.26 300)', 'oklch(40% 0.22 300)'],
+        swatches: ['#6b3080','#5a2070','#8050a0','#9070b8'],
+      },
+      {
+        id: 'champagne',
+        name: 'Champagne',
+        tagline: 'Effervescent, elegant, timeless.',
+        desc: 'The ultimate nude with a champagne shimmer. Our finest micro-glitter particles create a soft effervescence that elevates any look from casual to celebration.',
+        price: 22,
+        glowColor: 'oklch(90% 0.06 72 / 0.2)',
+        bottleGrad: ['oklch(90% 0.08 72)', 'oklch(80% 0.06 72)'],
+        swatches: ['#d4c4a0','#c4b080','#e0d0b0','#bea870'],
+      },
+      {
+        id: 'crystal-clear',
+        name: 'Crystal Clear',
+        tagline: 'Pure, pristine, glass-shine perfection.',
+        desc: 'Our bestselling top coat in a standalone formula. Wear alone for a Korean glass-nail effect or layer over any shade for mirror-finish brilliance.',
+        price: 28, badge: 'Top Rated',
+        glowColor: 'oklch(95% 0.02 200 / 0.15)',
+        bottleGrad: ['oklch(95% 0.03 200)', 'oklch(88% 0.02 200)'],
+        swatches: ['#e8f4f8','#d0e8f0','#f0f8fc','#c0d8e8'],
+      },
+      {
+        id: 'coral-reef',
+        name: 'Coral Reef',
+        tagline: 'Sun-kissed, vibrant, irresistibly warm.',
+        desc: 'A vivid coral-orange that pops against every skin tone. Inspired by the Great Barrier Reef, this shade is pure optimism in a bottle.',
+        price: 23, badge: 'New',
+        glowColor: 'oklch(68% 0.24 35 / 0.25)',
+        bottleGrad: ['oklch(72% 0.26 35)', 'oklch(58% 0.22 35)'],
+        swatches: ['#e06030','#c85020','#f08050','#d87040'],
+      },
+      {
+        id: 'cherry-bomb',
+        name: 'Cherry Bomb',
+        tagline: 'Fierce, saturated, fearlessly red.',
+        desc: 'A true cherry red with maximum pigment and zero compromise. The kind of red that makes you feel invincible. Bold, bright, and completely addictive.',
+        price: 24, badge: 'Fan Fave',
+        glowColor: 'oklch(60% 0.32 25 / 0.3)',
+        bottleGrad: ['oklch(62% 0.32 25)', 'oklch(48% 0.28 25)'],
+        swatches: ['#cc2020','#b01010','#e03030','#d04040'],
+      },
+      {
+        id: 'noir-mystique',
+        name: 'Noir Mystique',
+        tagline: 'Matte black with a magnetic finish.',
+        desc: 'Pure matte black redefined. No chalky texture, no fading — just a smooth, velvety finish that stays dark and dramatic for two full weeks.',
+        price: 25, badge: 'Limited',
+        glowColor: 'oklch(25% 0.04 355 / 0.3)',
+        bottleGrad: ['oklch(22% 0.04 355)', 'oklch(10% 0.02 355)'],
+        swatches: ['#1a1a1a','#0a0a0a','#2a2a2a','#383838'],
+      },
+    ];
+
+    const FAQS = [
+      { q: 'How long does Ruby Nails polish last?', a: 'With our full 4-step ritual (Prep + Base Coat + 2 colour coats + Top Coat), most customers get 12–14 days of wear without chipping. Results vary based on nail type and activity level.' },
+      { q: 'Is Ruby Nails truly cruelty-free and vegan?', a: 'Yes, completely. We are PETA-certified, never test on animals at any stage, and our formulas contain zero animal-derived ingredients. We\'re also certified by The Vegan Society.' },
+      { q: 'What does "10-Free" mean?', a: 'Our formula is free from the 10 most harmful chemicals traditionally used in nail polish, including formaldehyde, toluene, DBP, camphor, and formaldehyde resin. Safe for pregnant women and sensitive individuals.' },
+      { q: 'How do I remove Ruby Nails polish?', a: 'Use our Gentle Remover pads (acetone-free) or any standard acetone remover. Saturate a cotton pad, hold against the nail for 20 seconds, then gently wipe away. No scrubbing required.' },
+      { q: 'Do you offer free UK delivery?', a: 'Yes! Free standard delivery on all UK orders over £30. Orders placed before 2pm Monday–Friday are dispatched same day and arrive within 1–2 business days.' },
+      { q: 'Can I use Ruby Nails on gel nails or acrylics?', a: 'Yes — our formula works beautifully over gel bases and acrylics. Many nail technicians use Ruby Nails as their gel-top colour choice for enhanced durability and finish.' },
+    ];
+
+    // ── BUILD PRODUCTS ──
+    function buildProducts() {
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = PRODUCTS.map((p, i) => `
+        <div class="product-card reveal" data-product-id="${p.id}"
+             style="--glow-color:${p.glowColor};animation-delay:${i * 0.08}s"
+             onclick="openModal('${p.id}')" role="button" tabindex="0"
+             aria-label="View ${p.name} details">
+          <div class="product-card-img" style="background:linear-gradient(135deg,${p.bottleGrad[0]}20,${p.bottleGrad[1]}10)">
+            ${p.badge ? `<span class="product-pill">${p.badge}</span>` : ''}
+            <svg width="70" height="160" viewBox="0 0 70 160">
+              <defs><linearGradient id="pg${i}" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="${p.bottleGrad[0]}"/>
+                <stop offset="100%" stop-color="${p.bottleGrad[1]}"/>
+              </linearGradient></defs>
+              <rect x="24" y="0" width="22" height="28" rx="5" fill="oklch(74% 0.14 72)" opacity="0.8"/>
+              <rect x="18" y="24" width="34" height="12" rx="5" fill="oklch(84% 0.12 72)" opacity="0.7"/>
+              <rect x="10" y="34" width="50" height="118" rx="12" fill="url(#pg${i})"/>
+              <rect x="17" y="55" width="14" height="90" rx="7" fill="white" opacity="0.15"/>
+            </svg>
+          </div>
+          <div class="product-card-body">
+            <h3 class="product-name">${p.name}</h3>
+            <p class="product-desc">${p.tagline}</p>
+            <div class="product-swatches">
+              ${p.swatches.map(s => `<div class="swatch" style="background:${s}" title="${s}"></div>`).join('')}
+            </div>
+            <div class="product-footer">
+              <span class="product-price">£${p.price}</span>
+              <button class="product-btn" onclick="event.stopPropagation();openModal('${p.id}')">Quick View</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
-  });
 
-  // ── 3D TILT CARDS ──
-  document.querySelectorAll('[data-tilt]').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = (e.clientX - cx) / (rect.width / 2);
-      const dy = (e.clientY - cy) / (rect.height / 2);
-      const glow = card.querySelector('.product-card-glow');
-      const px = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-      const py = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
-      card.style.setProperty('--mx', px + '%');
-      card.style.setProperty('--my', py + '%');
-      gsap.to(card, { rotateY: dx * 8, rotateX: -dy * 8, duration: 0.4, ease: 'power2.out', transformPerspective: 800 });
-    });
-    card.addEventListener('mouseleave', () => {
-      gsap.to(card, { rotateY: 0, rotateX: 0, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
-    });
-  });
-
-  // ── RITUAL STAGGER ──
-  gsap.utils.toArray('.ritual-step').forEach((step, i) => {
-    gsap.fromTo(step,
-      { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: 0.8, delay: i * 0.15, ease: 'power3.out',
-        scrollTrigger: { trigger: '#ritual', start: 'top 75%', toggleActions: 'play none none none' }
+    // ── BUILD FAQ ──
+    function buildFaq() {
+      const list = document.getElementById('faq-list');
+      list.innerHTML = FAQS.map((f, i) => `
+        <div class="faq-item reveal" id="faq-${i}">
+          <button class="faq-q" onclick="toggleFaq(${i})" aria-expanded="false" aria-controls="faq-a-${i}">
+            ${f.q}
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a" id="faq-a-${i}">${f.a}</div>
+        </div>
+      `).join('');
+    }
+    function toggleFaq(i) {
+      const item = document.getElementById(`faq-${i}`);
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.faq-q').setAttribute('aria-expanded','false');
+      });
+      if (!wasOpen) {
+        item.classList.add('open');
+        item.querySelector('.faq-q').setAttribute('aria-expanded','true');
       }
-    );
-  });
+    }
 
-  // ── TESTIMONIALS CAROUSEL ──
-  const track = document.getElementById('t-track');
-  const dots  = document.querySelectorAll('.t-dot');
-  const cards = document.querySelectorAll('.testimonial-card');
-  let current = 0, autoTimer;
+    // ── MODAL ──
+    function openModal(id) {
+      const p = PRODUCTS.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('modal-product-name').textContent = p.name;
+      document.getElementById('modal-tagline').textContent = p.tagline;
+      document.getElementById('modal-desc').textContent = p.desc;
+      document.getElementById('modal-price').textContent = `£${p.price}`;
+      document.getElementById('modal-price-btn').textContent = `£${p.price}`;
+      document.getElementById('modal-badge').textContent = p.badge || 'Collection';
+      document.getElementById('modal-orig').textContent = '';
+      const visual = document.getElementById('modal-visual');
+      visual.innerHTML = `
+        <svg width="100" height="240" viewBox="0 0 100 240">
+          <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${p.bottleGrad[0]}"/>
+            <stop offset="100%" stop-color="${p.bottleGrad[1]}"/>
+          </linearGradient></defs>
+          <rect x="34" y="0" width="32" height="40" rx="8" fill="oklch(74% 0.14 72)" opacity="0.9"/>
+          <rect x="26" y="36" width="48" height="18" rx="8" fill="oklch(84% 0.12 72)" opacity="0.8"/>
+          <rect x="14" y="52" width="72" height="180" rx="18" fill="url(#mg)"/>
+          <rect x="24" y="80" width="20" height="140" rx="10" fill="white" opacity="0.15"/>
+        </svg>`;
+      const swatchesEl = document.getElementById('modal-swatches');
+      swatchesEl.innerHTML = p.swatches.map((s, i) =>
+        `<div class="modal-swatch ${i===0?'active':''}" style="background:${s}" onclick="this.parentNode.querySelectorAll('.modal-swatch').forEach(e=>e.classList.remove('active'));this.classList.add('active')"></div>`
+      ).join('');
+      document.getElementById('modal-overlay').classList.add('open');
+      document.getElementById('product-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.getElementById('product-modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+    document.getElementById('modal-overlay').addEventListener('click', closeModal);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.getElementById('modal-add-btn').addEventListener('click', function() {
+      const orig = this.textContent;
+      this.textContent = 'Added to Bag! ✓';
+      this.classList.add('clicked');
+      setTimeout(() => { this.textContent = orig; this.classList.remove('clicked'); }, 2000);
+    });
 
-  function goTo(idx) {
-    current = (idx + cards.length) % cards.length;
-    const cardW = cards[0].offsetWidth + 24;
-    const vw = document.getElementById('t-viewport').offsetWidth;
-    const offset = Math.max(0, (cardW * current) - (vw / 2) + (cardW / 2));
-    gsap.to(track, { x: -offset, duration: 0.6, ease: 'power3.out' });
-    dots.forEach((d, i) => d.classList.toggle('active', i === current));
-  }
+    // ── SPARKLE CANVAS ──
+    const canvas = document.getElementById('sparkle-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    const SPARKLE_COLORS = [
+      'oklch(78% 0.17 72)', 'oklch(72% 0.22 18)', 'oklch(68% 0.30 345)',
+      'oklch(55% 0.26 300)', 'oklch(96% 0.01 60)', 'oklch(68% 0.24 35)'
+    ];
+    const particles = [];
 
-  dots.forEach((d, i) => d.addEventListener('click', () => { goTo(i); clearInterval(autoTimer); autoTimer = setInterval(() => goTo(current + 1), 4000); }));
-  autoTimer = setInterval(() => goTo(current + 1), 4000);
+    function resizeCanvas() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-  // ── PRODUCT CARDS STAGGER ──
-  gsap.utils.toArray('.product-card').forEach((card, i) => {
-    gsap.fromTo(card,
-      { opacity: 0, y: 60, scale: 0.96 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.8,
-        delay: (i % 3) * 0.1,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none none' }
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * W;
+        this.y = H + 20;
+        this.size = Math.random() * 2.5 + 0.5;
+        this.speedY = -(Math.random() * 0.6 + 0.2);
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.opacity = Math.random() * 0.6 + 0.1;
+        this.twinkleSpeed = Math.random() * 0.03 + 0.01;
+        this.twinklePhase = Math.random() * Math.PI * 2;
+        this.color = SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)];
+        this.type = Math.random() < 0.3 ? 'star' : 'dot';
       }
-    );
-  });
+      drawStar(cx, cy, r) {
+        ctx.beginPath();
+        for (let i = 0; i < 4; i++) {
+          const angle = (i * Math.PI) / 2;
+          const x = cx + r * Math.cos(angle);
+          const y = cy + r * Math.sin(angle);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          const ix = cx + r * 0.4 * Math.cos(angle + Math.PI / 4);
+          const iy = cy + r * 0.4 * Math.sin(angle + Math.PI / 4);
+          ctx.lineTo(ix, iy);
+        }
+        ctx.closePath();
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.twinklePhase += this.twinkleSpeed;
+        const tw = Math.abs(Math.sin(this.twinklePhase));
+        const alpha = this.opacity * tw;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = this.color;
+        if (this.type === 'star') {
+          this.drawStar(this.x, this.y, this.size * 1.5);
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+        if (this.y < -20) this.reset();
+      }
+    }
 
-  // ── MARQUEE PAUSE ON HOVER ──
-  const mtrack = document.querySelector('.marquee-track');
-  mtrack.addEventListener('mouseenter', () => mtrack.style.animationPlayState = 'paused');
-  mtrack.addEventListener('mouseleave', () => mtrack.style.animationPlayState = 'running');
-</script>
+    for (let i = 0; i < 80; i++) {
+      const p = new Particle();
+      p.y = Math.random() * H;
+      particles.push(p);
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => p.update());
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // ── CURSOR ──
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    (function trackCursor() {
+      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(trackCursor);
+    })();
+
+    // ── NAV SCROLL ──
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', scrollY > 60);
+    });
+
+    // ── CAROUSEL ──
+    let carouselIndex = 0;
+    const carousel = document.getElementById('testimonials-carousel');
+    function updateCarousel() {
+      const cards = carousel.querySelectorAll('.testimonial-card');
+      const visibleCount = window.innerWidth > 900 ? 3 : 1;
+      const maxIndex = cards.length - visibleCount;
+      carouselIndex = Math.max(0, Math.min(carouselIndex, maxIndex));
+      const cardW = cards[0].offsetWidth + 32;
+      carousel.style.transition = 'transform 0.6s cubic-bezier(0.16,1,0.3,1)';
+      carousel.style.transform = `translateX(-${carouselIndex * cardW}px)`;
+    }
+    document.getElementById('carousel-next').addEventListener('click', () => { carouselIndex++; updateCarousel(); });
+    document.getElementById('carousel-prev').addEventListener('click', () => { carouselIndex--; updateCarousel(); });
+
+    // ── SCROLL UTILITY ──
+    function scrollToSection(id) {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ── CTA ──
+    function handleCtaSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('.cta-submit');
+      btn.textContent = 'You\'re in! ✓';
+      btn.style.background = 'linear-gradient(135deg, oklch(48% 0.18 145), oklch(55% 0.20 145))';
+      setTimeout(() => {
+        btn.textContent = 'Join Now';
+        btn.style.background = '';
+        e.target.reset();
+      }, 3000);
+    }
+
+    // ── GSAP ANIMATIONS ──
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero entrance
+    gsap.timeline({ delay: 0.2 })
+      .to('.hero-eyebrow', { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' })
+      .to('.hero-title',   { opacity: 1, y: 0, duration: 1,   ease: 'expo.out' }, '-=0.5')
+      .to('.hero-sub',     { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' }, '-=0.6')
+      .to('.hero-btns',    { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' }, '-=0.5')
+      .to('.hero-bottles', { opacity: 1, y: 0, duration: 1,   ease: 'back.out(1.5)' }, '-=0.4');
+
+    // Scroll reveals
+    gsap.utils.toArray('.reveal').forEach(el => {
+      gsap.fromTo(el, { opacity: 0, y: 50 }, {
+        opacity: 1, y: 0, duration: 0.8, ease: 'expo.out',
+        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+      });
+    });
+    gsap.utils.toArray('.reveal-left').forEach(el => {
+      gsap.fromTo(el, { opacity: 0, x: -60 }, {
+        opacity: 1, x: 0, duration: 0.9, ease: 'expo.out',
+        scrollTrigger: { trigger: el, start: 'top 80%' }
+      });
+    });
+    gsap.utils.toArray('.reveal-right').forEach(el => {
+      gsap.fromTo(el, { opacity: 0, x: 60 }, {
+        opacity: 1, x: 0, duration: 0.9, ease: 'expo.out',
+        scrollTrigger: { trigger: el, start: 'top 80%' }
+      });
+    });
+
+    // Counter animation
+    gsap.utils.toArray('[data-count]').forEach(el => {
+      const target = +el.dataset.count;
+      ScrollTrigger.create({
+        trigger: el, start: 'top 85%',
+        onEnter: () => gsap.fromTo({ v: 0 }, { v: target, duration: 1.8, ease: 'power2.out',
+          onUpdate: function() { el.textContent = Math.round(this.targets()[0].v) + (target > 50 ? '' : ''); }
+        })
+      });
+    });
+
+    // Product card 3D tilt
+    document.addEventListener('mousemove', e => {
+      document.querySelectorAll('.product-card').forEach(card => {
+        const r = card.getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        const dx = (e.clientX - cx) / (r.width / 2);
+        const dy = (e.clientY - cy) / (r.height / 2);
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 1.5) {
+          card.style.transform = `perspective(600px) rotateY(${dx*6}deg) rotateX(${-dy*6}deg) translateZ(8px)`;
+        } else {
+          card.style.transform = '';
+        }
+      });
+    });
+
+    // Blob color shift on scroll
+    const blobs = document.querySelectorAll('.blob');
+    ScrollTrigger.create({
+      trigger: 'body', start: 'top top', end: 'bottom bottom',
+      onUpdate: self => {
+        const p = self.progress;
+        const hue = 18 + p * 282;
+        document.documentElement.style.setProperty('--scroll-hue', hue);
+        blobs[0].style.opacity = 0.35 + Math.sin(p * Math.PI * 2) * 0.15;
+        blobs[1].style.opacity = 0.35 + Math.sin(p * Math.PI * 2 + 1) * 0.15;
+        blobs[2].style.opacity = 0.35 + Math.sin(p * Math.PI * 2 + 2) * 0.12;
+      }
+    });
+
+    // Init
+    buildProducts();
+    buildFaq();
+  </script>
 </body>
 </html>
