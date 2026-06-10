@@ -19,9 +19,25 @@ for arg in "$@"; do
   esac
 done
 
+normalize_path() {
+  local input="$1"
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -u "$input"
+  elif [[ "$input" =~ ^([A-Za-z]):[\\/](.*)$ ]]; then
+    local drive="${BASH_REMATCH[1],,}"
+    local rest="${BASH_REMATCH[2]//\\//}"
+    printf '/%s/%s' "$drive" "$rest"
+  else
+    printf '%s' "$input"
+  fi
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+HOME="$(normalize_path "$HOME")"
+CODEX_HOME="$(normalize_path "${CODEX_HOME:-$HOME/.codex}")"
+AGENTS_HOME="$(normalize_path "${AGENTS_HOME:-$HOME/.agents}")"
+ECC_GLOBAL_HOOKS_DIR="$(normalize_path "${ECC_GLOBAL_HOOKS_DIR:-$CODEX_HOME/git-hooks}")"
 
 CONFIG_FILE="$CODEX_HOME/config.toml"
 AGENTS_FILE="$CODEX_HOME/AGENTS.md"
@@ -494,23 +510,23 @@ fi
 
 log "Merging ECC MCP servers into $CONFIG_FILE (add-only, preserving user config)"
 if [[ "$MODE" == "dry-run" ]]; then
-  node "$MCP_MERGE_SCRIPT" "$CONFIG_FILE" --dry-run $UPDATE_MCP
+  node "$MCP_MERGE_SCRIPT" "$CONFIG_FILE" --dry-run ${UPDATE_MCP:+"$UPDATE_MCP"}
 else
-  node "$MCP_MERGE_SCRIPT" "$CONFIG_FILE" $UPDATE_MCP
+  node "$MCP_MERGE_SCRIPT" "$CONFIG_FILE" ${UPDATE_MCP:+"$UPDATE_MCP"}
 fi
 
 log "Installing global git safety hooks"
 if [[ "$MODE" == "dry-run" ]]; then
   HOME="$HOME" \
   CODEX_HOME="$CODEX_HOME" \
-  AGENTS_HOME="${AGENTS_HOME:-$HOME/.agents}" \
-  ECC_GLOBAL_HOOKS_DIR="${ECC_GLOBAL_HOOKS_DIR:-$CODEX_HOME/git-hooks}" \
+  AGENTS_HOME="$AGENTS_HOME" \
+  ECC_GLOBAL_HOOKS_DIR="$ECC_GLOBAL_HOOKS_DIR" \
     "$HOOKS_INSTALLER" --dry-run
 else
   HOME="$HOME" \
   CODEX_HOME="$CODEX_HOME" \
-  AGENTS_HOME="${AGENTS_HOME:-$HOME/.agents}" \
-  ECC_GLOBAL_HOOKS_DIR="${ECC_GLOBAL_HOOKS_DIR:-$CODEX_HOME/git-hooks}" \
+  AGENTS_HOME="$AGENTS_HOME" \
+  ECC_GLOBAL_HOOKS_DIR="$ECC_GLOBAL_HOOKS_DIR" \
     "$HOOKS_INSTALLER"
 fi
 
@@ -520,8 +536,8 @@ if [[ "$MODE" == "dry-run" ]]; then
 else
   HOME="$HOME" \
   CODEX_HOME="$CODEX_HOME" \
-  AGENTS_HOME="${AGENTS_HOME:-$HOME/.agents}" \
-  ECC_GLOBAL_HOOKS_DIR="${ECC_GLOBAL_HOOKS_DIR:-$CODEX_HOME/git-hooks}" \
+  AGENTS_HOME="$AGENTS_HOME" \
+  ECC_GLOBAL_HOOKS_DIR="$ECC_GLOBAL_HOOKS_DIR" \
     "$SANITY_CHECKER"
 fi
 

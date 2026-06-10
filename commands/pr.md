@@ -1,5 +1,5 @@
 ---
-description: "Create a GitHub PR from current branch with unpushed commits — discovers templates, analyzes changes, pushes"
+description: “Create a GitHub PR from current branch with unpushed commits — discovers templates, analyzes changes, pushes”
 argument-hint: "[base-branch] (default: main)"
 ---
 
@@ -26,7 +26,7 @@ git log origin/<base>..HEAD --oneline
 
 | Check | Condition | Action if Failed |
 |---|---|---|
-| Not on base branch | Current branch ≠ base | Stop: "Switch to a feature branch first." |
+| Not on base branch | Current branch ≠  base | Stop: "Switch to a feature branch first." |
 | Clean working directory | No uncommitted changes | Warn: "You have uncommitted changes. Commit or stash first." |
 | Has commits ahead | `git log origin/<base>..HEAD` not empty | Stop: "No commits ahead of `<base>`. Nothing to PR." |
 | No existing PR | `gh pr list --head <branch> --json number` is empty | Stop: "PR already exists: #<number>. Use `gh pr view <number> --web` to open it." |
@@ -71,12 +71,13 @@ Categorize changed files: source, tests, docs, config, migrations.
 
 ### Planning Artifacts
 
-Check for related artifacts produced by `/plan-prd`, `/plan`, or the legacy PRP workflow:
+Check for related artifacts produced by `/plan-prd`, `/plan`, or the GitHub-native epic layer:
 - `.claude/prds/` — PRDs this PR implements a milestone of
 - `.claude/plans/` — Plans executed by this PR
 - `.claude/PRPs/prds/` — legacy PRP PRDs
 - `.claude/PRPs/plans/` — legacy PRP implementation plans
 - `.claude/PRPs/reports/` — legacy PRP implementation reports
+- GitHub epic issue — claim, sync, validate, publish, review, unblock, and decompose state live here
 
 Reference these in the PR body if they exist.
 
@@ -103,7 +104,7 @@ If rebase conflicts occur, stop and inform the user.
 
 ### With Template
 
-If a PR template was found in Phase 2, fill in each section using the commit and file analysis. Preserve all template sections — leave sections as "N/A" if not applicable rather than removing them.
+If a PR template was found in Phase 2, fill in each section using the commit and file analysis. Preserve all template sections — leave sections as “N/A” if not applicable rather than removing them.
 
 ### Without Template
 
@@ -162,7 +163,7 @@ URL: <url>
 Branch: <head> → <base>
 Changes: +<additions> -<deletions> across <changedFiles> files
 
-CI Checks: <status summary or "pending" or "none configured">
+CI Checks: <status summary or “pending” or “none configured”>
 
 Artifacts referenced:
   - <any PRDs/plans linked in PR body>
@@ -182,3 +183,4 @@ Next steps:
 - **Force push needed**: If remote has diverged and rebase was done, use `git push --force-with-lease` (never `--force`).
 - **Multiple PR templates**: If `.github/PULL_REQUEST_TEMPLATE/` has multiple files, list them and ask user to choose.
 - **Large PR (>20 files)**: Warn about PR size. Suggest splitting if changes are logically separable.
+
