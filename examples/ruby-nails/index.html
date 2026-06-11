@@ -8,23 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ruby: #8B1A2F;
-  --ruby-light: #C4324F;
-  --gold: #C9A84C;
-  --gold-light: #E8C97A;
-  --cream: #FAF7F4;
-  --ink: #0F0A0A;
-  --ink-60: rgba(15,10,10,0.6);
-  --ink-20: rgba(15,10,10,0.2);
-  --surface: #FEFCFA;
-  --muted: #6B5E5E;
-  --border: rgba(139,26,47,0.12);
+  --ruby: #C4324F;
+  --ruby-deep: #8B1A2F;
+  --ruby-light: #E8556A;
+  --gold: #D4B668;
+  --gold-light: #EDD896;
+  --cream: #F5EEE8;
+  --ink: #09050C;
+  --surface: #09050C;
+  --card: #130A14;
+  --muted: rgba(245,238,232,0.45);
+  --border: rgba(212,182,104,0.18);
 
   --text-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.8rem);
   --text-sm: clamp(0.85rem, 0.8rem + 0.25vw, 0.95rem);
   --text-base: clamp(1rem, 0.92rem + 0.4vw, 1.125rem);
-  --text-lg: clamp(1.2rem, 1rem + 1vw, 1.5rem);
-  --text-xl: clamp(1.5rem, 1.2rem + 1.5vw, 2.2rem);
   --text-2xl: clamp(2rem, 1.4rem + 3vw, 4rem);
   --text-hero: clamp(3.5rem, 2rem + 7vw, 9rem);
 
@@ -40,7 +38,7 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; overflow-x: hidden; }
-body { font-family: 'Inter', sans-serif; background: var(--surface); color: var(--ink); overflow-x: hidden; cursor: none; }
+body { font-family: 'Inter', sans-serif; background: var(--surface); color: var(--cream); overflow-x: hidden; cursor: none; }
 
 body::after {
   content: '';
@@ -48,13 +46,26 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.04;
+  opacity: 0.06;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
 }
 
+/* BG BLOBS */
+.blob-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  will-change: transform;
+}
+.blob-ruby { background: radial-gradient(circle, #8B1A2F 0%, transparent 70%); }
+.blob-gold { background: radial-gradient(circle, #8A6030 0%, transparent 70%); }
+.blob-violet { background: radial-gradient(circle, #3D1060 0%, transparent 70%); }
+
 /* CURSOR */
-#cursor { position: fixed; width: 10px; height: 10px; background: var(--ruby); border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); transition: transform 80ms var(--ease-out), background 300ms; mix-blend-mode: multiply; }
+#cursor { position: fixed; width: 10px; height: 10px; background: var(--ruby); border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); transition: transform 80ms var(--ease-out), background 300ms; }
 #cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid var(--ruby-light); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform 300ms var(--ease-out), width 300ms, height 300ms, opacity 300ms; opacity: 0.5; }
 body.hovering #cursor { transform: translate(-50%,-50%) scale(2.5); background: var(--gold); }
 body.hovering #cursor-ring { width: 60px; height: 60px; opacity: 0.2; }
@@ -64,224 +75,224 @@ body.hovering #cursor-ring { width: 60px; height: 60px; opacity: 0.2; }
 #loader { position: fixed; inset: 0; background: var(--ink); z-index: 100000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
 .loader-logo { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem,6vw,4rem); font-weight: 300; color: var(--cream); letter-spacing: 0.5em; text-transform: uppercase; opacity: 0; animation: loaderFade 0.6s 0.3s var(--ease-out) forwards; }
 .loader-logo span { color: var(--ruby-light); }
-.loader-bar-track { width: min(280px,60vw); height: 1px; background: rgba(255,255,255,0.12); position: relative; overflow: hidden; }
+.loader-bar-track { width: min(280px,60vw); height: 1px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden; }
 .loader-bar-fill { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, var(--ruby), var(--gold)); width: 0; animation: loaderBar 1.8s 0.5s var(--ease-out) forwards; }
-.loader-label { font-size: var(--text-xs); color: rgba(255,255,255,0.3); letter-spacing: 0.3em; text-transform: uppercase; opacity: 0; animation: loaderFade 0.6s 0.6s forwards; }
+.loader-label { font-size: var(--text-xs); color: rgba(255,255,255,0.25); letter-spacing: 0.3em; text-transform: uppercase; opacity: 0; animation: loaderFade 0.6s 0.6s forwards; }
 @keyframes loaderFade { to { opacity: 1; } }
 @keyframes loaderBar { to { width: 100%; } }
 #loader.done { animation: loaderOut 0.8s 0.3s var(--ease-in-out) forwards; }
 @keyframes loaderOut { to { opacity: 0; pointer-events: none; } }
 
 /* ANNOUNCE */
-#announce { background: var(--ruby); color: var(--cream); font-size: var(--text-xs); letter-spacing: 0.25em; text-transform: uppercase; padding: 0.6rem 0; overflow: hidden; }
+#announce { background: linear-gradient(90deg, var(--ruby-deep), var(--ruby), var(--ruby-deep)); color: var(--cream); font-size: var(--text-xs); letter-spacing: 0.25em; text-transform: uppercase; padding: 0.65rem 0; overflow: hidden; }
 .announce-track { display: flex; gap: 4rem; animation: marquee 22s linear infinite; white-space: nowrap; width: max-content; }
 .announce-track span::before { content: '✦'; margin-right: 1rem; opacity: 0.6; }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* NAV */
-nav { position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem var(--space-md); background: rgba(254,252,250,0.85); backdrop-filter: blur(16px) saturate(160%); border-bottom: 1px solid var(--border); transition: box-shadow 300ms; }
-nav.scrolled { box-shadow: 0 4px 40px rgba(139,26,47,0.08); }
-.nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
-.nav-logo em { color: var(--ruby); font-style: normal; }
+nav { position: sticky; top: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem var(--space-md); background: rgba(9,5,12,0.8); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); transition: box-shadow 300ms; }
+nav.scrolled { box-shadow: 0 4px 40px rgba(196,50,79,0.12); }
+.nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase; color: var(--cream); text-decoration: none; }
+.nav-logo em { color: var(--ruby-light); font-style: normal; }
 .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-.nav-links a { font-size: var(--text-sm); font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 200ms; position: relative; }
-.nav-links a::after { content: ''; position: absolute; left: 0; bottom: -3px; width: 0; height: 1px; background: var(--ruby); transition: width 300ms var(--ease-out); }
-.nav-links a:hover { color: var(--ruby); }
+.nav-links a { font-size: var(--text-sm); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 200ms; position: relative; }
+.nav-links a::after { content: ''; position: absolute; left: 0; bottom: -3px; width: 0; height: 1px; background: var(--gold); transition: width 300ms var(--ease-out); }
+.nav-links a:hover { color: var(--gold); }
 .nav-links a:hover::after { width: 100%; }
 .nav-actions { display: flex; align-items: center; gap: 1.5rem; }
 .nav-btn { font-size: var(--text-sm); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: none; border: none; cursor: none; transition: color 200ms; }
-.nav-btn:hover { color: var(--ruby); }
-#cart-btn { display: flex; align-items: center; gap: 0.4rem; background: var(--ruby); color: var(--cream); border: none; padding: 0.55rem 1.2rem; font-size: var(--text-xs); letter-spacing: 0.2em; text-transform: uppercase; cursor: none; transition: background 200ms, transform 150ms; }
-#cart-btn:hover { background: var(--ruby-light); transform: translateY(-1px); }
+.nav-btn:hover { color: var(--gold); }
+#cart-btn { display: flex; align-items: center; gap: 0.4rem; background: var(--ruby); color: var(--cream); border: none; padding: 0.55rem 1.2rem; font-size: var(--text-xs); letter-spacing: 0.2em; text-transform: uppercase; cursor: none; transition: background 200ms, transform 150ms, box-shadow 200ms; }
+#cart-btn:hover { background: var(--ruby-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(196,50,79,0.4); }
 .cart-count { background: var(--gold); color: var(--ink); width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 0.65rem; font-weight: 500; opacity: 0; transform: scale(0); transition: opacity 200ms, transform 200ms var(--ease-out); }
 .cart-count.visible { opacity: 1; transform: scale(1); }
 
 /* HERO */
-#hero { min-height: 100svh; display: grid; grid-template-columns: 55fr 45fr; overflow: hidden; position: relative; }
+#hero { min-height: 100svh; display: grid; grid-template-columns: 55fr 45fr; overflow: hidden; position: relative; background: #09050C; }
 .hero-left { display: flex; flex-direction: column; justify-content: flex-end; padding: var(--space-lg) var(--space-md); padding-right: var(--space-sm); position: relative; z-index: 2; }
-.hero-eyebrow { font-size: var(--text-xs); letter-spacing: 0.4em; text-transform: uppercase; color: var(--ruby); margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.8s 2.5s var(--ease-out) forwards; }
-.hero-title { font-family: 'Cormorant Garamond', serif; font-size: var(--text-hero); font-weight: 300; line-height: 0.9; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 2.5rem; }
+.hero-eyebrow { font-size: var(--text-xs); letter-spacing: 0.4em; text-transform: uppercase; color: var(--gold); margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.8s 2.5s var(--ease-out) forwards; }
+.hero-title { font-family: 'Cormorant Garamond', serif; font-size: var(--text-hero); font-weight: 300; line-height: 0.9; letter-spacing: -0.02em; margin-bottom: 2.5rem; }
 .hero-title-line { display: block; overflow: hidden; }
 .hero-title-inner { display: block; transform: translateY(110%); animation: slideUp 1s var(--ease-out) forwards; }
-.hero-title-line:nth-child(1) .hero-title-inner { animation-delay: 2.6s; }
-.hero-title-line:nth-child(2) .hero-title-inner { animation-delay: 2.75s; color: var(--ruby); font-style: italic; }
+.hero-title-line:nth-child(1) .hero-title-inner { animation-delay: 2.6s; color: var(--cream); }
+.hero-title-line:nth-child(2) .hero-title-inner { animation-delay: 2.75s; background: linear-gradient(135deg, var(--ruby-light) 0%, var(--gold) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-style: italic; }
 .hero-sub { font-size: var(--text-base); color: var(--muted); line-height: 1.7; max-width: 380px; margin-bottom: 3rem; opacity: 0; animation: fadeUp 0.8s 3s var(--ease-out) forwards; }
 .hero-ctas { display: flex; gap: 1rem; align-items: center; opacity: 0; animation: fadeUp 0.8s 3.15s var(--ease-out) forwards; }
-.btn-primary { background: var(--ruby); color: var(--cream); border: none; padding: 1rem 2.5rem; font-size: var(--text-sm); letter-spacing: 0.2em; text-transform: uppercase; cursor: none; transition: background 250ms, transform 150ms; text-decoration: none; display: inline-block; }
-.btn-primary:hover { background: var(--ruby-light); transform: translateY(-2px); }
-.btn-ghost { border: 1px solid var(--border); background: none; color: var(--muted); padding: 1rem 2rem; font-size: var(--text-sm); letter-spacing: 0.15em; text-transform: uppercase; cursor: none; transition: border-color 250ms, color 250ms; text-decoration: none; display: inline-block; }
-.btn-ghost:hover { border-color: var(--ruby); color: var(--ruby); }
+.btn-primary { background: var(--ruby); color: var(--cream); border: none; padding: 1rem 2.5rem; font-size: var(--text-sm); letter-spacing: 0.2em; text-transform: uppercase; cursor: none; transition: background 250ms, transform 150ms, box-shadow 250ms; text-decoration: none; display: inline-block; }
+.btn-primary:hover { background: var(--ruby-light); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(196,50,79,0.45); }
+.btn-ghost { border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--muted); padding: 1rem 2rem; font-size: var(--text-sm); letter-spacing: 0.15em; text-transform: uppercase; cursor: none; transition: border-color 250ms, color 250ms, background 250ms; text-decoration: none; display: inline-block; }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); background: rgba(212,182,104,0.06); }
 .hero-scroll-hint { position: absolute; bottom: 2.5rem; left: var(--space-md); display: flex; align-items: center; gap: 1rem; font-size: var(--text-xs); letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); opacity: 0; animation: fadeUp 0.8s 3.4s var(--ease-out) forwards; }
-.scroll-line { width: 40px; height: 1px; background: var(--ruby); animation: scrollPulse 2s 3.8s ease-in-out infinite; }
-@keyframes scrollPulse { 0%,100% { width: 40px; opacity: 1; } 50% { width: 60px; opacity: 0.5; } }
+.scroll-line { width: 40px; height: 1px; background: var(--gold); animation: scrollPulse 2s 3.8s ease-in-out infinite; }
+@keyframes scrollPulse { 0%,100% { width: 40px; opacity: 1; } 50% { width: 60px; opacity: 0.4; } }
 
-.hero-right { display: flex; align-items: center; justify-content: center; position: relative; background: linear-gradient(160deg, #f9f0ef 0%, #f3e8e5 50%, #ebe0dd 100%); overflow: hidden; }
-.hero-right::before { content: ''; position: absolute; top: -30%; left: -30%; width: 160%; height: 160%; background: radial-gradient(ellipse at 60% 40%, rgba(139,26,47,0.08) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(201,168,76,0.06) 0%, transparent 50%); animation: heroAura 8s ease-in-out infinite alternate; }
-@keyframes heroAura { from { transform: scale(1) rotate(0deg); } to { transform: scale(1.08) rotate(3deg); } }
-
-.glass-card { position: relative; z-index: 2; background: rgba(255,255,255,0.4); backdrop-filter: blur(20px) saturate(140%); border: 1px solid rgba(255,255,255,0.7); border-radius: 2px; padding: 3rem 2.5rem 4rem; display: flex; align-items: flex-end; justify-content: center; gap: 1rem; width: 80%; max-width: 420px; box-shadow: 0 8px 32px rgba(139,26,47,0.1), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8); opacity: 0; animation: fadeUp 1s 2.8s var(--ease-out) forwards; }
-.glass-badge { position: absolute; top: -14px; right: 2rem; background: var(--ruby); color: var(--cream); font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; padding: 0.4rem 1rem; }
+.hero-right { display: flex; align-items: center; justify-content: center; position: relative; background: #100614; overflow: hidden; }
+.glass-card { position: relative; z-index: 2; background: rgba(255,255,255,0.04); backdrop-filter: blur(24px) saturate(140%); border: 1px solid rgba(212,182,104,0.22); border-radius: 2px; padding: 3rem 2.5rem 4rem; display: flex; align-items: flex-end; justify-content: center; gap: 1rem; width: 80%; max-width: 420px; box-shadow: 0 8px 48px rgba(196,50,79,0.18), 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08); opacity: 0; animation: fadeUp 1s 2.8s var(--ease-out) forwards; }
+.glass-badge { position: absolute; top: -14px; right: 2rem; background: linear-gradient(90deg, var(--ruby-deep), var(--ruby)); color: var(--cream); font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; padding: 0.4rem 1rem; }
 .bottle-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; cursor: none; transition: transform 400ms var(--ease-out); }
-.bottle-wrap:hover { transform: translateY(-12px) rotate(-1deg); }
+.bottle-wrap:hover { transform: translateY(-14px) rotate(-1deg) scale(1.05); filter: drop-shadow(0 20px 40px rgba(196,50,79,0.35)); }
 .bottle-wrap:nth-child(1) { transform: translateY(16px) rotate(-2deg); }
-.bottle-wrap:nth-child(1):hover { transform: translateY(4px) rotate(-2deg); }
+.bottle-wrap:nth-child(1):hover { transform: translateY(4px) rotate(-2deg) scale(1.05); }
 .bottle-wrap:nth-child(3) { transform: translateY(8px) rotate(2deg); }
-.bottle-wrap:nth-child(3):hover { transform: translateY(-4px) rotate(2deg); }
+.bottle-wrap:nth-child(3):hover { transform: translateY(-4px) rotate(2deg) scale(1.05); }
 .bottle-name { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; font-weight: 400; letter-spacing: 0.15em; color: var(--muted); text-align: center; }
-.bottle-price { font-size: 0.7rem; letter-spacing: 0.2em; color: var(--ruby); }
+.bottle-price { font-size: 0.7rem; letter-spacing: 0.2em; color: var(--gold); }
 .hero-badge-row { position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); display: flex; gap: 0.5rem; }
-.hero-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ruby); opacity: 0.3; }
+.hero-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); opacity: 0.25; }
 .hero-dot.active { opacity: 1; }
 
 /* SECTION HEADER */
 .section-header { text-align: center; margin-bottom: var(--space-lg); }
-.section-eyebrow { font-size: var(--text-xs); letter-spacing: 0.4em; text-transform: uppercase; color: var(--ruby); display: block; margin-bottom: 1rem; }
-.section-title { font-family: 'Cormorant Garamond', serif; font-size: var(--text-2xl); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; }
-.section-title em { color: var(--ruby); font-style: italic; }
+.section-eyebrow { font-size: var(--text-xs); letter-spacing: 0.4em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 1rem; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-size: var(--text-2xl); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; color: var(--cream); }
+.section-title em { color: var(--ruby-light); font-style: italic; }
 .section-sub { font-size: var(--text-base); color: var(--muted); margin-top: 1rem; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.7; }
-.rule { width: 40px; height: 1px; background: var(--ruby); margin: 1.5rem auto 0; }
+.rule { width: 40px; height: 1px; background: linear-gradient(90deg, var(--ruby), var(--gold)); margin: 1.5rem auto 0; }
 
 /* STATS */
-#stats { background: var(--ink); padding: var(--space-lg) var(--space-md); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-md); align-items: center; }
-.stat-item { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+#stats { background: #0A0415; padding: var(--space-lg) var(--space-md); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-md); align-items: center; position: relative; overflow: hidden; }
+#stats::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(61,16,96,0.4) 0%, transparent 70%); pointer-events: none; }
+.stat-item { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; position: relative; z-index: 1; }
 .ring-wrap { position: relative; width: 100px; height: 100px; }
 .ring-wrap svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-.ring-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 3; }
+.ring-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 3; }
 .ring-fill { fill: none; stroke: var(--ruby-light); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 283; stroke-dashoffset: 283; transition: stroke-dashoffset 1.4s var(--ease-out); }
 .ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--cream); }
 .ring-number { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; line-height: 1; }
-.ring-unit { font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.4); }
-.stat-desc { font-size: var(--text-xs); letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.4); text-align: center; }
+.ring-unit { font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.35); }
+.stat-desc { font-size: var(--text-xs); letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.3); text-align: center; }
 
 /* SHADE STORIES */
 #shade-pin-target { overflow: hidden; }
 .shade-track { display: flex; width: 500vw; }
 .shade-slide { width: 100vw; height: 100vh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; position: relative; }
 .shade-left { display: flex; flex-direction: column; justify-content: center; padding: var(--space-lg) var(--space-md); position: relative; z-index: 2; }
-.shade-watermark { position: absolute; bottom: -0.1em; left: -0.05em; font-family: 'Cormorant Garamond', serif; font-size: clamp(6rem,18vw,18rem); font-weight: 300; color: transparent; -webkit-text-stroke: 1px rgba(139,26,47,0.08); line-height: 1; pointer-events: none; white-space: nowrap; }
-.shade-number { font-size: var(--text-xs); letter-spacing: 0.4em; color: var(--ruby); margin-bottom: 1.5rem; }
-.shade-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem,5vw,5rem); font-weight: 300; line-height: 1; margin-bottom: 1.5rem; }
+.shade-watermark { position: absolute; bottom: -0.1em; left: -0.05em; font-family: 'Cormorant Garamond', serif; font-size: clamp(6rem,18vw,18rem); font-weight: 300; color: transparent; -webkit-text-stroke: 1px rgba(212,182,104,0.1); line-height: 1; pointer-events: none; white-space: nowrap; }
+.shade-number { font-size: var(--text-xs); letter-spacing: 0.4em; color: var(--gold); margin-bottom: 1.5rem; }
+.shade-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem,5vw,5rem); font-weight: 300; line-height: 1; margin-bottom: 1.5rem; color: var(--cream); }
 .shade-desc { font-size: var(--text-base); color: var(--muted); line-height: 1.8; max-width: 360px; margin-bottom: 2.5rem; }
-.shade-swatch { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 12px rgba(0,0,0,0.2); margin-bottom: 2rem; }
+.shade-swatch { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 2px 16px rgba(0,0,0,0.4); margin-bottom: 2rem; }
 .shade-right { display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
 .shade-bg-fill { position: absolute; inset: 0; }
-.shade-slide:nth-child(1) .shade-bg-fill { background: linear-gradient(135deg, #f5e0e4 0%, #e8c5cb 100%); }
-.shade-slide:nth-child(2) .shade-bg-fill { background: linear-gradient(135deg, #f5f0e0 0%, #e8d9a0 100%); }
-.shade-slide:nth-child(3) .shade-bg-fill { background: linear-gradient(135deg, #1a1525 0%, #2d2040 100%); }
-.shade-slide:nth-child(4) .shade-bg-fill { background: linear-gradient(135deg, #3d0a14 0%, #6b1a28 100%); }
-.shade-slide:nth-child(5) .shade-bg-fill { background: linear-gradient(135deg, #f5e8de 0%, #e8c5a0 100%); }
-.shade-bottle-wrap { position: relative; z-index: 2; filter: drop-shadow(0 20px 60px rgba(0,0,0,0.25)); transition: transform 600ms var(--ease-out); }
+.shade-slide:nth-child(1) .shade-bg-fill { background: linear-gradient(135deg, #2a0812 0%, #4d1020 100%); }
+.shade-slide:nth-child(2) .shade-bg-fill { background: linear-gradient(135deg, #1a1505 0%, #3d3010 100%); }
+.shade-slide:nth-child(3) .shade-bg-fill { background: linear-gradient(135deg, #080515 0%, #1a1030 100%); }
+.shade-slide:nth-child(4) .shade-bg-fill { background: linear-gradient(135deg, #200408 0%, #500a14 100%); }
+.shade-slide:nth-child(5) .shade-bg-fill { background: linear-gradient(135deg, #1a0c08 0%, #3d2015 100%); }
+.shade-bottle-wrap { position: relative; z-index: 2; filter: drop-shadow(0 20px 60px rgba(0,0,0,0.5)); transition: transform 600ms var(--ease-out); }
 
 /* PRODUCTS */
-#products { padding: var(--space-xl) var(--space-md); }
+#products { padding: var(--space-xl) var(--space-md); background: #0D0610; position: relative; overflow: hidden; }
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px; }
-.product-card { position: relative; background: var(--cream); overflow: hidden; cursor: none; }
+.product-card { position: relative; background: #130A14; overflow: hidden; cursor: none; }
 .product-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--ruby), var(--gold)); opacity: 0; transition: opacity 400ms; z-index: 0; padding: 1px; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
 .product-card:hover::before { opacity: 1; }
-.product-visual { aspect-ratio: 3/4; background: var(--cream); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: background 400ms; position: relative; z-index: 1; }
-.product-card:nth-child(even) .product-visual { background: #f4eeeb; }
-.product-card:nth-child(3n) .product-visual { background: #f0eaed; }
+.product-visual { aspect-ratio: 3/4; background: #1a0d1c; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; z-index: 1; transition: background 400ms; }
+.product-card:nth-child(even) .product-visual { background: #100A1A; }
+.product-card:nth-child(3n) .product-visual { background: #180A10; }
+.product-card:hover .product-visual { background: #1f1025; }
 .product-img-wrap { transition: transform 600ms var(--ease-out); display: flex; align-items: center; justify-content: center; }
-.product-card:hover .product-img-wrap { transform: scale(1.05) translateY(-8px); }
+.product-card:hover .product-img-wrap { transform: scale(1.06) translateY(-10px); filter: drop-shadow(0 20px 40px rgba(196,50,79,0.4)); }
 .product-info { padding: 1.25rem 1.5rem 1.5rem; position: relative; z-index: 1; }
 .product-shade-bar { height: 3px; border-radius: 2px; margin-bottom: 1rem; width: 40%; }
-.product-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; margin-bottom: 0.25rem; }
+.product-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; margin-bottom: 0.25rem; color: var(--cream); }
 .product-shade { font-size: var(--text-xs); color: var(--muted); letter-spacing: 0.1em; }
 .product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; }
-.product-price { font-size: var(--text-sm); color: var(--ruby); font-weight: 500; }
-.product-add { background: none; border: 1px solid var(--border); color: var(--muted); font-size: var(--text-xs); letter-spacing: 0.2em; text-transform: uppercase; padding: 0.45rem 0.9rem; cursor: none; transition: background 200ms, color 200ms, border-color 200ms; }
-.product-add:hover { background: var(--ruby); color: var(--cream); border-color: var(--ruby); }
+.product-price { font-size: var(--text-sm); color: var(--gold); font-weight: 500; }
+.product-add { background: none; border: 1px solid var(--border); color: var(--muted); font-size: var(--text-xs); letter-spacing: 0.2em; text-transform: uppercase; padding: 0.45rem 0.9rem; cursor: none; transition: background 200ms, color 200ms, border-color 200ms, box-shadow 200ms; }
+.product-add:hover { background: var(--ruby); color: var(--cream); border-color: var(--ruby); box-shadow: 0 4px 20px rgba(196,50,79,0.4); }
 .product-new-tag { position: absolute; top: 1rem; left: 1rem; background: var(--ruby); color: var(--cream); font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; padding: 0.3rem 0.7rem; z-index: 3; }
-.product-wishlist { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.8); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: none; display: grid; place-items: center; font-size: 0.9rem; opacity: 0; transform: translateY(-4px); transition: opacity 200ms, transform 200ms; z-index: 3; }
+.product-wishlist { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.06); border: 1px solid var(--border); width: 32px; height: 32px; border-radius: 50%; cursor: none; display: grid; place-items: center; font-size: 0.9rem; opacity: 0; transform: translateY(-4px); transition: opacity 200ms, transform 200ms, background 200ms; z-index: 3; color: var(--gold); }
 .product-card:hover .product-wishlist { opacity: 1; transform: translateY(0); }
 
 /* FORMULA */
-#formula { padding: var(--space-xl) var(--space-md); background: var(--ink); color: var(--cream); display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); align-items: center; }
+#formula { padding: var(--space-xl) var(--space-md); background: #060310; position: relative; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); align-items: center; }
+#formula::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 50%, rgba(139,26,47,0.15) 0%, transparent 60%); pointer-events: none; }
 .formula-left .section-eyebrow { color: var(--gold); }
-.formula-left .section-title { color: var(--cream); }
 .formula-left .section-title em { color: var(--gold); }
-.formula-left .section-sub { color: rgba(255,255,255,0.5); }
+.formula-left .section-sub { color: var(--muted); }
 .formula-benefits { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3rem; }
-.benefit-item { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.25rem; }
-.benefit-icon { font-size: 1.4rem; margin-bottom: 0.75rem; }
+.benefit-item { border-top: 1px solid rgba(212,182,104,0.15); padding-top: 1.25rem; }
+.benefit-icon { font-size: 1.4rem; margin-bottom: 0.75rem; color: var(--gold); }
 .benefit-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 400; margin-bottom: 0.5rem; color: var(--cream); }
-.benefit-desc { font-size: var(--text-xs); color: rgba(255,255,255,0.4); line-height: 1.7; }
+.benefit-desc { font-size: var(--text-xs); color: var(--muted); line-height: 1.7; }
 .formula-right { display: flex; align-items: center; justify-content: center; position: relative; }
-.formula-bg-orb { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(139,26,47,0.15) 0%, transparent 70%); animation: orbPulse 4s ease-in-out infinite; }
-@keyframes orbPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.7; } }
-.formula-bottle { position: relative; z-index: 2; filter: drop-shadow(0 30px 80px rgba(139,26,47,0.4)); }
+.formula-bg-orb { position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(139,26,47,0.2) 0%, transparent 70%); animation: orbPulse 4s ease-in-out infinite; }
+@keyframes orbPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.6; } }
+.formula-bottle { position: relative; z-index: 2; filter: drop-shadow(0 30px 80px rgba(196,50,79,0.5)); }
 
 /* TESTIMONIALS */
-#testimonials { padding: var(--space-xl) var(--space-md); overflow: hidden; }
+#testimonials { padding: var(--space-xl) var(--space-md); background: #110408; position: relative; overflow: hidden; }
+#testimonials::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 100%, rgba(139,26,47,0.2) 0%, transparent 60%); pointer-events: none; }
 .testimonial-track { display: flex; gap: 2px; transition: transform 600ms var(--ease-out); }
 .testimonial-slide { min-width: 100%; display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-lg); align-items: center; }
 .testimonial-meta { display: flex; flex-direction: column; gap: 1rem; }
-.testimonial-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f0e0df, #dcc8c7); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--ruby); font-weight: 300; }
-.testimonial-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; }
+.testimonial-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #3d1020, #6b1a30); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--ruby-light); font-weight: 300; }
+.testimonial-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 400; color: var(--cream); }
 .testimonial-handle { font-size: var(--text-xs); color: var(--muted); letter-spacing: 0.1em; }
 .testimonial-stars { color: var(--gold); font-size: 0.9rem; letter-spacing: 0.2em; }
-.testimonial-quote { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem,3vw,2.8rem); font-weight: 300; line-height: 1.4; color: var(--ink); position: relative; padding-left: 2.5rem; }
-.testimonial-quote::before { content: '\201C'; position: absolute; left: 0; top: -0.3em; font-size: 4em; color: var(--ruby); opacity: 0.2; line-height: 1; }
+.testimonial-quote { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem,3vw,2.8rem); font-weight: 300; line-height: 1.4; color: var(--cream); position: relative; padding-left: 2.5rem; }
+.testimonial-quote::before { content: '\201C'; position: absolute; left: 0; top: -0.3em; font-size: 4em; color: var(--ruby-light); opacity: 0.3; line-height: 1; }
 .testimonial-controls { display: flex; align-items: center; gap: 1.5rem; margin-top: 3rem; justify-content: center; }
-.t-nav { background: none; border: 1px solid var(--border); width: 48px; height: 48px; cursor: none; display: grid; place-items: center; font-size: 1.2rem; color: var(--muted); transition: background 200ms, color 200ms, border-color 200ms; }
+.t-nav { background: rgba(255,255,255,0.04); border: 1px solid var(--border); width: 48px; height: 48px; cursor: none; display: grid; place-items: center; font-size: 1.2rem; color: var(--muted); transition: background 200ms, color 200ms, border-color 200ms; }
 .t-nav:hover { background: var(--ruby); color: var(--cream); border-color: var(--ruby); }
 .t-dots { display: flex; gap: 0.5rem; }
-.t-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: none; transition: background 200ms, transform 200ms; }
-.t-dot.active { background: var(--ruby); transform: scale(1.4); }
+.t-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(212,182,104,0.2); cursor: none; transition: background 200ms, transform 200ms; }
+.t-dot.active { background: var(--gold); transform: scale(1.4); }
 
 /* CART DRAWER */
-#cart-overlay { position: fixed; inset: 0; background: rgba(15,10,10,0.5); z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 350ms; backdrop-filter: blur(4px); }
+#cart-overlay { position: fixed; inset: 0; background: rgba(9,5,12,0.7); z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 350ms; backdrop-filter: blur(6px); }
 #cart-overlay.open { opacity: 1; pointer-events: auto; }
-#cart-drawer { position: fixed; top: 0; right: 0; width: min(480px,100vw); height: 100dvh; background: var(--surface); z-index: 10001; transform: translateX(100%); transition: transform 450ms var(--ease-out); display: flex; flex-direction: column; box-shadow: -8px 0 40px rgba(0,0,0,0.15); }
+#cart-drawer { position: fixed; top: 0; right: 0; width: min(480px,100vw); height: 100dvh; background: #130A14; border-left: 1px solid var(--border); z-index: 10001; transform: translateX(100%); transition: transform 450ms var(--ease-out); display: flex; flex-direction: column; box-shadow: -12px 0 60px rgba(0,0,0,0.5); }
 #cart-drawer.open { transform: translateX(0); }
 .cart-header { display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); }
-.cart-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; letter-spacing: 0.15em; }
+.cart-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; letter-spacing: 0.15em; color: var(--cream); }
 .cart-close { background: none; border: none; font-size: 1.5rem; color: var(--muted); cursor: none; width: 40px; height: 40px; display: grid; place-items: center; transition: color 200ms; }
-.cart-close:hover { color: var(--ruby); }
+.cart-close:hover { color: var(--ruby-light); }
 .cart-items { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; }
 .cart-item { display: grid; grid-template-columns: 80px 1fr auto; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); align-items: center; }
-.cart-item-img { width: 80px; height: 80px; background: var(--cream); display: flex; align-items: center; justify-content: center; }
-.cart-item-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 400; margin-bottom: 0.25rem; }
+.cart-item-img { width: 80px; height: 80px; background: #1a0d1c; display: flex; align-items: center; justify-content: center; }
+.cart-item-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 400; margin-bottom: 0.25rem; color: var(--cream); }
 .cart-item-shade { font-size: var(--text-xs); color: var(--muted); }
 .cart-qty { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; }
 .qty-btn { width: 28px; height: 28px; border: 1px solid var(--border); background: none; cursor: none; display: grid; place-items: center; font-size: 1rem; color: var(--muted); transition: background 200ms, color 200ms; }
 .qty-btn:hover { background: var(--ruby); color: var(--cream); border-color: var(--ruby); }
-.qty-display { font-size: var(--text-sm); min-width: 24px; text-align: center; }
-.cart-item-price { font-size: var(--text-sm); color: var(--ruby); font-weight: 500; }
+.qty-display { font-size: var(--text-sm); min-width: 24px; text-align: center; color: var(--cream); }
+.cart-item-price { font-size: var(--text-sm); color: var(--gold); font-weight: 500; }
 .cart-remove { display: block; background: none; border: none; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); cursor: none; margin-top: 0.4rem; transition: color 200ms; }
-.cart-remove:hover { color: var(--ruby); }
+.cart-remove:hover { color: var(--ruby-light); }
 .cart-empty { text-align: center; padding: 4rem 2rem; color: var(--muted); }
-.cart-empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+.cart-empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.2; }
 .cart-empty-text { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; }
-.cart-footer { padding: 1.5rem 2rem; border-top: 1px solid var(--border); background: var(--cream); }
+.cart-footer { padding: 1.5rem 2rem; border-top: 1px solid var(--border); background: #0D0610; }
 .cart-subtotal { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .cart-subtotal-label { font-size: var(--text-sm); letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
-.cart-subtotal-amount { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--ruby); }
-.cart-checkout { width: 100%; background: var(--ruby); color: var(--cream); border: none; padding: 1.1rem; font-size: var(--text-sm); letter-spacing: 0.25em; text-transform: uppercase; cursor: none; transition: background 250ms; }
-.cart-checkout:hover { background: var(--ruby-light); }
+.cart-subtotal-amount { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--gold); }
+.cart-checkout { width: 100%; background: var(--ruby); color: var(--cream); border: none; padding: 1.1rem; font-size: var(--text-sm); letter-spacing: 0.25em; text-transform: uppercase; cursor: none; transition: background 250ms, box-shadow 250ms; }
+.cart-checkout:hover { background: var(--ruby-light); box-shadow: 0 8px 32px rgba(196,50,79,0.5); }
 .cart-shipping { font-size: var(--text-xs); text-align: center; color: var(--muted); margin-top: 0.75rem; }
 
 /* FAQ */
 #faq { padding: var(--space-xl) var(--space-md); max-width: 780px; margin: 0 auto; }
 .faq-item { border-bottom: 1px solid var(--border); }
-.faq-q { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; cursor: none; user-select: none; gap: 1rem; }
-.faq-q:hover { color: var(--ruby); }
-.faq-icon { font-size: 1.3rem; color: var(--ruby); flex-shrink: 0; transition: transform 300ms var(--ease-out); }
+.faq-q { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; cursor: none; user-select: none; gap: 1rem; color: var(--cream); }
+.faq-q:hover { color: var(--gold); }
+.faq-icon { font-size: 1.3rem; color: var(--gold); flex-shrink: 0; transition: transform 300ms var(--ease-out); }
 .faq-item.open .faq-icon { transform: rotate(45deg); }
 .faq-a { overflow: hidden; max-height: 0; transition: max-height 400ms var(--ease-out), padding 400ms; font-size: var(--text-base); color: var(--muted); line-height: 1.8; }
 .faq-item.open .faq-a { max-height: 300px; padding-bottom: 1.5rem; }
 
 /* FOOTER */
-footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--space-lg) var(--space-md); }
-.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--space-md); padding-bottom: var(--space-md); border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: var(--space-md); }
+footer { background: #050208; color: rgba(245,238,232,0.4); padding: var(--space-lg) var(--space-md); border-top: 1px solid var(--border); }
+.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--space-md); padding-bottom: var(--space-md); border-bottom: 1px solid rgba(212,182,104,0.08); margin-bottom: var(--space-md); }
 .footer-brand .nav-logo { color: var(--cream); font-size: 1.3rem; display: block; margin-bottom: 1rem; }
 .footer-tagline { font-size: var(--text-sm); line-height: 1.7; }
-.footer-col-title { font-size: var(--text-xs); letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 1.25rem; }
+.footer-col-title { font-size: var(--text-xs); letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,238,232,0.5); margin-bottom: 1.25rem; }
 .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
-.footer-links a { font-size: var(--text-sm); color: rgba(255,255,255,0.4); text-decoration: none; transition: color 200ms; }
+.footer-links a { font-size: var(--text-sm); color: rgba(245,238,232,0.3); text-decoration: none; transition: color 200ms; }
 .footer-links a:hover { color: var(--ruby-light); }
 .footer-bottom { display: flex; align-items: center; justify-content: space-between; font-size: var(--text-xs); letter-spacing: 0.1em; }
-.footer-bottom a { color: rgba(255,255,255,0.3); text-decoration: none; }
+.footer-bottom a { color: rgba(245,238,232,0.25); text-decoration: none; }
 
 /* ANIMATIONS */
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
@@ -344,23 +355,23 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
   <div class="cart-footer">
     <div class="cart-subtotal">
       <span class="cart-subtotal-label">Subtotal</span>
-      <span class="cart-subtotal-amount" id="cart-total">$0.00</span>
+      <span class="cart-subtotal-amount" id="cart-total">&#163;0.00</span>
     </div>
     <button class="cart-checkout">Proceed to Checkout</button>
-    <div class="cart-shipping">&#x2756; Complimentary shipping on orders over $75</div>
+    <div class="cart-shipping">&#x2756; Complimentary shipping on orders over &#163;75</div>
   </div>
 </div>
 
 <!-- ANNOUNCEMENT -->
 <div id="announce">
   <div class="announce-track">
-    <span>Free shipping on orders over $75</span>
+    <span>Free shipping on orders over &#163;75</span>
     <span>New arrivals: Noir Collection</span>
-    <span>16-free formula — vegan &amp; cruelty-free</span>
+    <span>16-free formula &#8212; vegan &amp; cruelty-free</span>
     <span>Introducing Shade Stories</span>
-    <span>Free shipping on orders over $75</span>
+    <span>Free shipping on orders over &#163;75</span>
     <span>New arrivals: Noir Collection</span>
-    <span>16-free formula — vegan &amp; cruelty-free</span>
+    <span>16-free formula &#8212; vegan &amp; cruelty-free</span>
     <span>Introducing Shade Stories</span>
   </div>
 </div>
@@ -376,15 +387,16 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
   </ul>
   <div class="nav-actions">
     <button class="nav-btn">Search</button>
-    <button id="cart-btn">
-      <span>Cart</span>
-      <span class="cart-count" id="cart-count">0</span>
-    </button>
+    <button id="cart-btn"><span>Cart</span><span class="cart-count" id="cart-count">0</span></button>
   </div>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
+  <div class="blob-field" id="hero-blobs">
+    <div class="blob blob-ruby" id="blob1" style="width:700px;height:700px;top:-20%;left:-15%"></div>
+    <div class="blob blob-violet" id="blob2" style="width:500px;height:500px;bottom:-10%;left:10%"></div>
+  </div>
   <div class="hero-left">
     <div class="hero-eyebrow">New Collection &#8212; SS 2025</div>
     <h1 class="hero-title">
@@ -402,65 +414,25 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
     </div>
   </div>
   <div class="hero-right">
-    <div class="glass-card">
+    <div class="blob-field">
+      <div class="blob blob-ruby" id="blob3" style="width:400px;height:400px;top:10%;right:-10%"></div>
+      <div class="blob blob-gold" id="blob4" style="width:300px;height:300px;bottom:5%;left:5%"></div>
+    </div>
+    <div class="glass-card" id="hero-card">
       <div class="glass-badge">New Season</div>
-      <!-- Bottle 1: Ruby Velvet -->
       <div class="bottle-wrap">
-        <svg width="58" height="180" viewBox="0 0 58 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="29" cy="170" rx="20" ry="5" fill="rgba(0,0,0,0.12)"/>
-          <rect x="22" y="0" width="14" height="22" rx="2" fill="#2a1a1a"/>
-          <rect x="24" y="2" width="10" height="3" rx="1" fill="rgba(255,255,255,0.15)"/>
-          <rect x="20" y="20" width="18" height="8" rx="1" fill="#3d2020"/>
-          <path d="M16 28 Q14 36 14 44 L14 158 Q14 166 22 168 L36 168 Q44 166 44 158 L44 44 Q44 36 42 28 Z" fill="#8B1A2F"/>
-          <path d="M20 32 Q19 38 19 46 L19 158" stroke="rgba(255,255,255,0.18)" stroke-width="2.5" stroke-linecap="round"/>
-          <rect x="18" y="100" width="22" height="40" rx="2" fill="rgba(255,255,255,0.06)"/>
-          <text x="29" y="123" font-size="5.5" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="0.5">RUBY</text>
-          <text x="29" y="131" font-size="4" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="1">NAILS</text>
-          <ellipse cx="29" cy="165" rx="15" ry="3.5" fill="#6d1424"/>
-        </svg>
-        <div class="bottle-name">Ruby Velvet</div>
-        <div class="bottle-price">$24</div>
+        <svg width="58" height="180" viewBox="0 0 58 180" fill="none"><ellipse cx="29" cy="170" rx="20" ry="5" fill="rgba(0,0,0,0.3)"/><rect x="22" y="0" width="14" height="22" rx="2" fill="#2a1a1a"/><rect x="24" y="2" width="10" height="3" rx="1" fill="rgba(255,255,255,0.15)"/><rect x="20" y="20" width="18" height="8" rx="1" fill="#3d2020"/><path d="M16 28 Q14 36 14 44 L14 158 Q14 166 22 168 L36 168 Q44 166 44 158 L44 44 Q44 36 42 28 Z" fill="#8B1A2F"/><path d="M20 32 Q19 38 19 46 L19 158" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round"/><rect x="18" y="100" width="22" height="40" rx="2" fill="rgba(255,255,255,0.06)"/><text x="29" y="123" font-size="5.5" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="0.5">RUBY</text><text x="29" y="131" font-size="4" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="1">NAILS</text><ellipse cx="29" cy="165" rx="15" ry="3.5" fill="#6d1424"/></svg>
+        <div class="bottle-name">Ruby Velvet</div><div class="bottle-price">&#163;24</div>
       </div>
-      <!-- Bottle 2: Midnight Plum (tallest, center) -->
       <div class="bottle-wrap">
-        <svg width="66" height="210" viewBox="0 0 66 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="33" cy="200" rx="24" ry="6" fill="rgba(0,0,0,0.15)"/>
-          <rect x="25" y="0" width="16" height="26" rx="2" fill="#1a1a2a"/>
-          <rect x="27" y="2" width="12" height="4" rx="1" fill="rgba(255,255,255,0.15)"/>
-          <rect x="22" y="24" width="22" height="9" rx="1" fill="#252535"/>
-          <path d="M18 33 Q16 42 16 52 L16 186 Q16 196 26 198 L40 198 Q50 196 50 186 L50 52 Q50 42 48 33 Z" fill="#1a1525"/>
-          <path d="M22 36 Q21 44 21 54 L21 186" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"/>
-          <rect x="20" y="116" width="26" height="48" rx="2" fill="rgba(255,255,255,0.06)"/>
-          <text x="33" y="142" font-size="6" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="0.5">RUBY</text>
-          <text x="33" y="151" font-size="4.5" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="1">NAILS</text>
-          <ellipse cx="33" cy="194" rx="18" ry="4" fill="#120f1a"/>
-          <circle cx="42" cy="42" r="3" fill="rgba(201,168,76,0.6)"/>
-        </svg>
-        <div class="bottle-name">Midnight Plum</div>
-        <div class="bottle-price">$24</div>
+        <svg width="66" height="210" viewBox="0 0 66 210" fill="none"><ellipse cx="33" cy="200" rx="24" ry="6" fill="rgba(0,0,0,0.3)"/><rect x="25" y="0" width="16" height="26" rx="2" fill="#1a1a2a"/><rect x="27" y="2" width="12" height="4" rx="1" fill="rgba(255,255,255,0.15)"/><rect x="22" y="24" width="22" height="9" rx="1" fill="#252535"/><path d="M18 33 Q16 42 16 52 L16 186 Q16 196 26 198 L40 198 Q50 196 50 186 L50 52 Q50 42 48 33 Z" fill="#1a1525"/><path d="M22 36 Q21 44 21 54 L21 186" stroke="rgba(255,255,255,0.14)" stroke-width="3" stroke-linecap="round"/><rect x="20" y="116" width="26" height="48" rx="2" fill="rgba(255,255,255,0.05)"/><text x="33" y="142" font-size="6" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="0.5">RUBY</text><text x="33" y="151" font-size="4.5" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="1">NAILS</text><ellipse cx="33" cy="194" rx="18" ry="4" fill="#120f1a"/><circle cx="42" cy="42" r="3" fill="rgba(212,182,104,0.7)"/></svg>
+        <div class="bottle-name">Midnight Plum</div><div class="bottle-price">&#163;24</div>
       </div>
-      <!-- Bottle 3: Gold Dust -->
       <div class="bottle-wrap">
-        <svg width="58" height="180" viewBox="0 0 58 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="29" cy="170" rx="20" ry="5" fill="rgba(0,0,0,0.12)"/>
-          <rect x="22" y="0" width="14" height="22" rx="2" fill="#2a2010"/>
-          <rect x="24" y="2" width="10" height="3" rx="1" fill="rgba(255,255,255,0.2)"/>
-          <rect x="20" y="20" width="18" height="8" rx="1" fill="#3d3010"/>
-          <path d="M16 28 Q14 36 14 44 L14 158 Q14 166 22 168 L36 168 Q44 166 44 158 L44 44 Q44 36 42 28 Z" fill="#C9A84C"/>
-          <path d="M20 32 Q19 38 19 46 L19 158" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round"/>
-          <rect x="18" y="100" width="22" height="40" rx="2" fill="rgba(255,255,255,0.1)"/>
-          <text x="29" y="123" font-size="5.5" fill="rgba(80,50,0,0.7)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="0.5">RUBY</text>
-          <text x="29" y="131" font-size="4" fill="rgba(80,50,0,0.5)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="1">NAILS</text>
-          <ellipse cx="29" cy="165" rx="15" ry="3.5" fill="#a07c2a"/>
-        </svg>
-        <div class="bottle-name">Gold Dust</div>
-        <div class="bottle-price">$26</div>
+        <svg width="58" height="180" viewBox="0 0 58 180" fill="none"><ellipse cx="29" cy="170" rx="20" ry="5" fill="rgba(0,0,0,0.25)"/><rect x="22" y="0" width="14" height="22" rx="2" fill="#2a2010"/><rect x="24" y="2" width="10" height="3" rx="1" fill="rgba(255,255,255,0.2)"/><rect x="20" y="20" width="18" height="8" rx="1" fill="#3d3010"/><path d="M16 28 Q14 36 14 44 L14 158 Q14 166 22 168 L36 168 Q44 166 44 158 L44 44 Q44 36 42 28 Z" fill="#C9A84C"/><path d="M20 32 Q19 38 19 46 L19 158" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round"/><rect x="18" y="100" width="22" height="40" rx="2" fill="rgba(255,255,255,0.1)"/><text x="29" y="123" font-size="5.5" fill="rgba(80,50,0,0.7)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="0.5">RUBY</text><text x="29" y="131" font-size="4" fill="rgba(80,50,0,0.5)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="1">NAILS</text><ellipse cx="29" cy="165" rx="15" ry="3.5" fill="#a07c2a"/></svg>
+        <div class="bottle-name">Gold Dust</div><div class="bottle-price">&#163;26</div>
       </div>
-      <div class="hero-badge-row">
-        <div class="hero-dot active"></div>
-        <div class="hero-dot"></div>
-        <div class="hero-dot"></div>
-      </div>
+      <div class="hero-badge-row"><div class="hero-dot active"></div><div class="hero-dot"></div><div class="hero-dot"></div></div>
     </div>
   </div>
 </section>
@@ -468,31 +440,19 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
 <!-- STATS -->
 <section id="stats">
   <div class="stat-item reveal">
-    <div class="ring-wrap">
-      <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45" data-pct="92"/></svg>
-      <div class="ring-label"><span class="ring-number">92</span><span class="ring-unit">%</span></div>
-    </div>
+    <div class="ring-wrap"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45" data-pct="92"/></svg><div class="ring-label"><span class="ring-number">92</span><span class="ring-unit">%</span></div></div>
     <div class="stat-desc">Customer Satisfaction</div>
   </div>
   <div class="stat-item reveal reveal-delay-1">
-    <div class="ring-wrap">
-      <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45" data-pct="78" style="stroke:var(--gold)"/></svg>
-      <div class="ring-label"><span class="ring-number">78</span><span class="ring-unit">%</span></div>
-    </div>
+    <div class="ring-wrap"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45" data-pct="78" style="stroke:var(--gold)"/></svg><div class="ring-label"><span class="ring-number">78</span><span class="ring-unit">%</span></div></div>
     <div class="stat-desc">Report 2-Week Wear</div>
   </div>
   <div class="stat-item reveal reveal-delay-2">
-    <div class="ring-wrap">
-      <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45" data-pct="100"/></svg>
-      <div class="ring-label"><span class="ring-number">16</span><span class="ring-unit">free</span></div>
-    </div>
+    <div class="ring-wrap"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45" data-pct="100"/></svg><div class="ring-label"><span class="ring-number">16</span><span class="ring-unit">free</span></div></div>
     <div class="stat-desc">Toxic Chemicals Free</div>
   </div>
   <div class="stat-item reveal reveal-delay-3">
-    <div class="ring-wrap">
-      <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45" data-pct="60" style="stroke:var(--gold-light)"/></svg>
-      <div class="ring-label"><span class="ring-number">60</span><span class="ring-unit">+</span></div>
-    </div>
+    <div class="ring-wrap"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45" data-pct="60" style="stroke:var(--gold-light)"/></svg><div class="ring-label"><span class="ring-number">60</span><span class="ring-unit">+</span></div></div>
     <div class="stat-desc">Shades in Collection</div>
   </div>
 </section>
@@ -501,145 +461,25 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
 <section id="shade-stories">
   <div id="shade-pin-target">
     <div class="shade-track">
-      <!-- Slide 1: Ruby Velvet -->
       <div class="shade-slide">
-        <div class="shade-left">
-          <div class="shade-watermark">Ruby</div>
-          <div class="shade-number">01 / 05</div>
-          <div class="shade-swatch" style="background:#8B1A2F"></div>
-          <h2 class="shade-name">Ruby<br>Velvet</h2>
-          <p class="shade-desc">Deep crimson with a satin finish. The shade that started it all — timeless, commanding, undeniably Ruby.</p>
-          <button class="btn-primary" onclick="addToCart('Ruby Velvet',24,'#8B1A2F')">Add to Cart &#8212; $24</button>
-        </div>
-        <div class="shade-right">
-          <div class="shade-bg-fill"></div>
-          <div class="shade-bottle-wrap">
-            <svg width="90" height="280" viewBox="0 0 90 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.18)"/>
-              <rect x="32" y="0" width="26" height="38" rx="3" fill="#2a1a1a"/>
-              <rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.15)"/>
-              <rect x="28" y="36" width="34" height="14" rx="2" fill="#3d2020"/>
-              <path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#8B1A2F"/>
-              <path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.2)" stroke-width="5" stroke-linecap="round"/>
-              <rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <text x="45" y="183" font-size="9" fill="rgba(255,255,255,0.55)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text>
-              <text x="45" y="196" font-size="6.5" fill="rgba(255,255,255,0.35)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text>
-              <ellipse cx="45" cy="258" rx="26" ry="6" fill="#6d1424"/>
-            </svg>
-          </div>
-        </div>
+        <div class="shade-left"><div class="shade-watermark">Ruby</div><div class="shade-number">01 / 05</div><div class="shade-swatch" style="background:#8B1A2F"></div><h2 class="shade-name">Ruby<br>Velvet</h2><p class="shade-desc">Deep crimson with a satin finish. The shade that started it all — timeless, commanding, undeniably Ruby.</p><button class="btn-primary" onclick="addToCart('Ruby Velvet',24,'#8B1A2F')">Add to Cart &#8212; &#163;24</button></div>
+        <div class="shade-right"><div class="shade-bg-fill"></div><div class="shade-bottle-wrap"><svg width="90" height="280" viewBox="0 0 90 280" fill="none"><ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.4)"/><rect x="32" y="0" width="26" height="38" rx="3" fill="#2a1a1a"/><rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.15)"/><rect x="28" y="36" width="34" height="14" rx="2" fill="#3d2020"/><path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#8B1A2F"/><path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.2)" stroke-width="5" stroke-linecap="round"/><rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.08)"/><text x="45" y="183" font-size="9" fill="rgba(255,255,255,0.55)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text><text x="45" y="196" font-size="6.5" fill="rgba(255,255,255,0.35)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text><ellipse cx="45" cy="258" rx="26" ry="6" fill="#6d1424"/></svg></div></div>
       </div>
-      <!-- Slide 2: Gold Dust -->
       <div class="shade-slide">
-        <div class="shade-left">
-          <div class="shade-watermark">Gold</div>
-          <div class="shade-number">02 / 05</div>
-          <div class="shade-swatch" style="background:#C9A84C"></div>
-          <h2 class="shade-name">Gold<br>Dust</h2>
-          <p class="shade-desc">Warm burnished gold with fine shimmer particles. Catches light like nothing else. For those who refuse to go unnoticed.</p>
-          <button class="btn-primary" onclick="addToCart('Gold Dust',26,'#C9A84C')">Add to Cart &#8212; $26</button>
-        </div>
-        <div class="shade-right">
-          <div class="shade-bg-fill"></div>
-          <div class="shade-bottle-wrap">
-            <svg width="90" height="280" viewBox="0 0 90 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.15)"/>
-              <rect x="32" y="0" width="26" height="38" rx="3" fill="#2a2010"/>
-              <rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.2)"/>
-              <rect x="28" y="36" width="34" height="14" rx="2" fill="#3d3010"/>
-              <path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#C9A84C"/>
-              <path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.35)" stroke-width="5" stroke-linecap="round"/>
-              <rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.12)"/>
-              <text x="45" y="183" font-size="9" fill="rgba(80,50,0,0.7)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text>
-              <text x="45" y="196" font-size="6.5" fill="rgba(80,50,0,0.5)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text>
-              <ellipse cx="45" cy="258" rx="26" ry="6" fill="#a07c2a"/>
-            </svg>
-          </div>
-        </div>
+        <div class="shade-left"><div class="shade-watermark">Gold</div><div class="shade-number">02 / 05</div><div class="shade-swatch" style="background:#C9A84C"></div><h2 class="shade-name">Gold<br>Dust</h2><p class="shade-desc">Warm burnished gold with fine shimmer particles. Catches light like nothing else. For those who refuse to go unnoticed.</p><button class="btn-primary" onclick="addToCart('Gold Dust',26,'#C9A84C')">Add to Cart &#8212; &#163;26</button></div>
+        <div class="shade-right"><div class="shade-bg-fill"></div><div class="shade-bottle-wrap"><svg width="90" height="280" viewBox="0 0 90 280" fill="none"><ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.3)"/><rect x="32" y="0" width="26" height="38" rx="3" fill="#2a2010"/><rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.2)"/><rect x="28" y="36" width="34" height="14" rx="2" fill="#3d3010"/><path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#C9A84C"/><path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.35)" stroke-width="5" stroke-linecap="round"/><rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.12)"/><text x="45" y="183" font-size="9" fill="rgba(80,50,0,0.7)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text><text x="45" y="196" font-size="6.5" fill="rgba(80,50,0,0.5)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text><ellipse cx="45" cy="258" rx="26" ry="6" fill="#a07c2a"/></svg></div></div>
       </div>
-      <!-- Slide 3: Midnight Plum -->
       <div class="shade-slide">
-        <div class="shade-left">
-          <div class="shade-watermark" style="-webkit-text-stroke-color:rgba(255,255,255,0.05)">Midnight</div>
-          <div class="shade-number" style="color:rgba(255,255,255,0.4)">03 / 05</div>
-          <div class="shade-swatch" style="background:#2D1B4E"></div>
-          <h2 class="shade-name" style="color:var(--cream)">Midnight<br>Plum</h2>
-          <p class="shade-desc" style="color:rgba(255,255,255,0.5)">Depths of darkened violet. A shade for evenings that go on forever and stories that never get told.</p>
-          <button class="btn-primary" onclick="addToCart('Midnight Plum',24,'#2D1B4E')">Add to Cart &#8212; $24</button>
-        </div>
-        <div class="shade-right">
-          <div class="shade-bg-fill"></div>
-          <div class="shade-bottle-wrap">
-            <svg width="90" height="280" viewBox="0 0 90 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.3)"/>
-              <rect x="32" y="0" width="26" height="38" rx="3" fill="#0f0a1a"/>
-              <rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.12)"/>
-              <rect x="28" y="36" width="34" height="14" rx="2" fill="#1a1030"/>
-              <path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#2D1B4E"/>
-              <path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.12)" stroke-width="5" stroke-linecap="round"/>
-              <rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.05)"/>
-              <text x="45" y="183" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text>
-              <text x="45" y="196" font-size="6.5" fill="rgba(255,255,255,0.25)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text>
-              <ellipse cx="45" cy="258" rx="26" ry="6" fill="#1a0f30"/>
-            </svg>
-          </div>
-        </div>
+        <div class="shade-left"><div class="shade-watermark" style="-webkit-text-stroke-color:rgba(255,255,255,0.06)">Midnight</div><div class="shade-number" style="color:rgba(255,255,255,0.4)">03 / 05</div><div class="shade-swatch" style="background:#2D1B4E"></div><h2 class="shade-name">Midnight<br>Plum</h2><p class="shade-desc">Depths of darkened violet. A shade for evenings that go on forever and stories that never get told.</p><button class="btn-primary" onclick="addToCart('Midnight Plum',24,'#2D1B4E')">Add to Cart &#8212; &#163;24</button></div>
+        <div class="shade-right"><div class="shade-bg-fill"></div><div class="shade-bottle-wrap"><svg width="90" height="280" viewBox="0 0 90 280" fill="none"><ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.5)"/><rect x="32" y="0" width="26" height="38" rx="3" fill="#0f0a1a"/><rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.1)"/><rect x="28" y="36" width="34" height="14" rx="2" fill="#1a1030"/><path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#2D1B4E"/><path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.12)" stroke-width="5" stroke-linecap="round"/><rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.05)"/><text x="45" y="183" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text><text x="45" y="196" font-size="6.5" fill="rgba(255,255,255,0.25)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text><ellipse cx="45" cy="258" rx="26" ry="6" fill="#1a0f30"/></svg></div></div>
       </div>
-      <!-- Slide 4: Cherry Bomb -->
       <div class="shade-slide">
-        <div class="shade-left">
-          <div class="shade-watermark" style="-webkit-text-stroke-color:rgba(255,255,255,0.05)">Cherry</div>
-          <div class="shade-number" style="color:rgba(255,200,180,0.6)">04 / 05</div>
-          <div class="shade-swatch" style="background:#C01830"></div>
-          <h2 class="shade-name" style="color:var(--cream)">Cherry<br>Bomb</h2>
-          <p class="shade-desc" style="color:rgba(255,255,255,0.5)">Incandescent cherry red with a high-gloss lacquer finish. Turns every gesture into a declaration.</p>
-          <button class="btn-primary" onclick="addToCart('Cherry Bomb',24,'#C01830')">Add to Cart &#8212; $24</button>
-        </div>
-        <div class="shade-right">
-          <div class="shade-bg-fill"></div>
-          <div class="shade-bottle-wrap">
-            <svg width="90" height="280" viewBox="0 0 90 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.25)"/>
-              <rect x="32" y="0" width="26" height="38" rx="3" fill="#1a0808"/>
-              <rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.15)"/>
-              <rect x="28" y="36" width="34" height="14" rx="2" fill="#2d1010"/>
-              <path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#C01830"/>
-              <path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.25)" stroke-width="5" stroke-linecap="round"/>
-              <rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.07)"/>
-              <text x="45" y="183" font-size="9" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text>
-              <text x="45" y="196" font-size="6.5" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text>
-              <ellipse cx="45" cy="258" rx="26" ry="6" fill="#900f20"/>
-            </svg>
-          </div>
-        </div>
+        <div class="shade-left"><div class="shade-watermark" style="-webkit-text-stroke-color:rgba(255,255,255,0.05)">Cherry</div><div class="shade-number" style="color:rgba(255,180,160,0.6)">04 / 05</div><div class="shade-swatch" style="background:#C01830"></div><h2 class="shade-name">Cherry<br>Bomb</h2><p class="shade-desc">Incandescent cherry red with a high-gloss lacquer finish. Turns every gesture into a declaration.</p><button class="btn-primary" onclick="addToCart('Cherry Bomb',24,'#C01830')">Add to Cart &#8212; &#163;24</button></div>
+        <div class="shade-right"><div class="shade-bg-fill"></div><div class="shade-bottle-wrap"><svg width="90" height="280" viewBox="0 0 90 280" fill="none"><ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.4)"/><rect x="32" y="0" width="26" height="38" rx="3" fill="#1a0808"/><rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.15)"/><rect x="28" y="36" width="34" height="14" rx="2" fill="#2d1010"/><path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#C01830"/><path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.25)" stroke-width="5" stroke-linecap="round"/><rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.07)"/><text x="45" y="183" font-size="9" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text><text x="45" y="196" font-size="6.5" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text><ellipse cx="45" cy="258" rx="26" ry="6" fill="#900f20"/></svg></div></div>
       </div>
-      <!-- Slide 5: Coral Reef -->
       <div class="shade-slide">
-        <div class="shade-left">
-          <div class="shade-watermark">Coral</div>
-          <div class="shade-number">05 / 05</div>
-          <div class="shade-swatch" style="background:#E07560"></div>
-          <h2 class="shade-name">Coral<br>Reef</h2>
-          <p class="shade-desc">Warm terracotta-coral with a luminous sheen. Designed for those who carry summer wherever they go.</p>
-          <button class="btn-primary" onclick="addToCart('Coral Reef',24,'#E07560')">Add to Cart &#8212; $24</button>
-        </div>
-        <div class="shade-right">
-          <div class="shade-bg-fill"></div>
-          <div class="shade-bottle-wrap">
-            <svg width="90" height="280" viewBox="0 0 90 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.12)"/>
-              <rect x="32" y="0" width="26" height="38" rx="3" fill="#2a1510"/>
-              <rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.2)"/>
-              <rect x="28" y="36" width="34" height="14" rx="2" fill="#3d2015"/>
-              <path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#E07560"/>
-              <path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.3)" stroke-width="5" stroke-linecap="round"/>
-              <rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.1)"/>
-              <text x="45" y="183" font-size="9" fill="rgba(80,30,20,0.6)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text>
-              <text x="45" y="196" font-size="6.5" fill="rgba(80,30,20,0.4)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text>
-              <ellipse cx="45" cy="258" rx="26" ry="6" fill="#b05040"/>
-            </svg>
-          </div>
-        </div>
+        <div class="shade-left"><div class="shade-watermark">Coral</div><div class="shade-number">05 / 05</div><div class="shade-swatch" style="background:#E07560"></div><h2 class="shade-name">Coral<br>Reef</h2><p class="shade-desc">Warm terracotta-coral with a luminous sheen. Designed for those who carry summer wherever they go.</p><button class="btn-primary" onclick="addToCart('Coral Reef',24,'#E07560')">Add to Cart &#8212; &#163;24</button></div>
+        <div class="shade-right"><div class="shade-bg-fill"></div><div class="shade-bottle-wrap"><svg width="90" height="280" viewBox="0 0 90 280" fill="none"><ellipse cx="45" cy="265" rx="32" ry="9" fill="rgba(0,0,0,0.3)"/><rect x="32" y="0" width="26" height="38" rx="3" fill="#2a1510"/><rect x="35" y="3" width="20" height="6" rx="2" fill="rgba(255,255,255,0.2)"/><rect x="28" y="36" width="34" height="14" rx="2" fill="#3d2015"/><path d="M22 50 Q18 66 18 82 L18 246 Q18 262 34 266 L56 266 Q72 262 72 246 L72 82 Q72 66 68 50 Z" fill="#E07560"/><path d="M28 56 Q26 70 26 84 L26 246" stroke="rgba(255,255,255,0.3)" stroke-width="5" stroke-linecap="round"/><rect x="26" y="148" width="38" height="66" rx="3" fill="rgba(255,255,255,0.1)"/><text x="45" y="183" font-size="9" fill="rgba(80,30,20,0.6)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1">RUBY</text><text x="45" y="196" font-size="6.5" fill="rgba(80,30,20,0.4)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="2">NAILS</text><ellipse cx="45" cy="258" rx="26" ry="6" fill="#b05040"/></svg></div></div>
       </div>
     </div>
   </div>
@@ -647,7 +487,7 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
 
 <!-- PRODUCTS -->
 <section id="products">
-  <div style="padding:var(--space-xl) var(--space-md) var(--space-md)">
+  <div style="padding:var(--space-xl) var(--space-md) var(--space-md);position:relative;z-index:1">
     <div class="section-header reveal">
       <span class="section-eyebrow">The Collection</span>
       <h2 class="section-title">Every Shade, <em>Intentional</em></h2>
@@ -668,81 +508,35 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
     </div>
     <div class="formula-benefits">
       <div class="benefit-item reveal"><div class="benefit-icon">&#9672;</div><div class="benefit-title">16-Free Formula</div><div class="benefit-desc">Formaldehyde, toluene, DBP and 13 more toxic chemicals removed at the source.</div></div>
-      <div class="benefit-item reveal reveal-delay-1"><div class="benefit-icon">&#9673;</div><div class="benefit-title">Vegan &amp; Cruelty-Free</div><div class="benefit-desc">Certified PETA vegan. No animal testing, ever. Beauty should never cost a life.</div></div>
+      <div class="benefit-item reveal reveal-delay-1"><div class="benefit-icon">&#9673;</div><div class="benefit-title">Vegan &amp; Cruelty-Free</div><div class="benefit-desc">Certified PETA vegan. No animal testing, ever.</div></div>
       <div class="benefit-item reveal reveal-delay-2"><div class="benefit-icon">&#9677;</div><div class="benefit-title">Long-Wear Technology</div><div class="benefit-desc">Patented bond technology delivers up to three weeks of chip-resistant wear.</div></div>
       <div class="benefit-item reveal reveal-delay-3"><div class="benefit-icon">&#9676;</div><div class="benefit-title">Glossy Finish</div><div class="benefit-desc">Ceramic-derived pigments deliver 40% more colour saturation than industry standard.</div></div>
     </div>
   </div>
   <div class="formula-right">
     <div class="formula-bg-orb"></div>
-    <div class="formula-bottle">
-      <svg width="140" height="420" viewBox="0 0 140 420" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="70" cy="400" rx="50" ry="14" fill="rgba(139,26,47,0.2)"/>
-        <rect x="50" y="0" width="40" height="56" rx="5" fill="#1a0f0f"/>
-        <rect x="54" y="5" width="32" height="9" rx="3" fill="rgba(255,255,255,0.1)"/>
-        <rect x="44" y="54" width="52" height="22" rx="3" fill="#2d1818"/>
-        <path d="M30 76 Q24 100 24 124 L24 372 Q24 396 50 402 L90 402 Q116 396 116 372 L116 124 Q116 100 110 76 Z" fill="url(#grad-formula)"/>
-        <defs><linearGradient id="grad-formula" x1="24" y1="76" x2="116" y2="402" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C4324F"/><stop offset="100%" stop-color="#6d1424"/></linearGradient></defs>
-        <path d="M38 86 Q34 106 34 126 L34 372" stroke="rgba(255,255,255,0.18)" stroke-width="8" stroke-linecap="round"/>
-        <rect x="34" y="216" width="72" height="106" rx="4" fill="rgba(255,255,255,0.07)"/>
-        <text x="70" y="267" font-size="14" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1.5">RUBY</text>
-        <text x="70" y="287" font-size="10" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="3">NAILS</text>
-        <ellipse cx="70" cy="392" rx="42" ry="9" fill="#6d1424"/>
-      </svg>
+    <div class="formula-bottle" id="formula-bottle">
+      <svg width="140" height="420" viewBox="0 0 140 420" fill="none"><ellipse cx="70" cy="400" rx="50" ry="14" fill="rgba(196,50,79,0.25)"/><rect x="50" y="0" width="40" height="56" rx="5" fill="#1a0f0f"/><rect x="54" y="5" width="32" height="9" rx="3" fill="rgba(255,255,255,0.1)"/><rect x="44" y="54" width="52" height="22" rx="3" fill="#2d1818"/><path d="M30 76 Q24 100 24 124 L24 372 Q24 396 50 402 L90 402 Q116 396 116 372 L116 124 Q116 100 110 76 Z" fill="url(#grad-formula)"/><defs><linearGradient id="grad-formula" x1="24" y1="76" x2="116" y2="402" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C4324F"/><stop offset="100%" stop-color="#6d1424"/></linearGradient></defs><path d="M38 86 Q34 106 34 126 L34 372" stroke="rgba(255,255,255,0.18)" stroke-width="8" stroke-linecap="round"/><rect x="34" y="216" width="72" height="106" rx="4" fill="rgba(255,255,255,0.07)"/><text x="70" y="267" font-size="14" fill="rgba(255,255,255,0.5)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="1.5">RUBY</text><text x="70" y="287" font-size="10" fill="rgba(255,255,255,0.3)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="3">NAILS</text><ellipse cx="70" cy="392" rx="42" ry="9" fill="#6d1424"/></svg>
     </div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
 <section id="testimonials">
-  <div class="section-header reveal" style="margin-bottom:var(--space-md)">
+  <div class="section-header reveal" style="margin-bottom:var(--space-md);position:relative;z-index:1">
     <span class="section-eyebrow">Client Stories</span>
     <h2 class="section-title">Worn With <em>Intention</em></h2>
     <div class="rule"></div>
   </div>
-  <div class="testimonial-slider">
+  <div class="testimonial-slider" style="position:relative;z-index:1">
     <div class="testimonial-track" id="testimonial-track">
-      <div class="testimonial-slide">
-        <div class="testimonial-meta">
-          <div class="testimonial-avatar">M</div>
-          <div><div class="testimonial-name">Margot Villeneuve</div><div class="testimonial-handle">@margotbeauty &#183; Paris</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div>
-        </div>
-        <blockquote class="testimonial-quote">Ruby Velvet is the only red I will ever wear. It changes how a room looks at you.</blockquote>
-      </div>
-      <div class="testimonial-slide">
-        <div class="testimonial-meta">
-          <div class="testimonial-avatar">S</div>
-          <div><div class="testimonial-name">Solange K.</div><div class="testimonial-handle">@solangek &#183; New York</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div>
-        </div>
-        <blockquote class="testimonial-quote">Midnight Plum lasted three full weeks without a single chip. I&#8217;ve never trusted a formula more.</blockquote>
-      </div>
-      <div class="testimonial-slide">
-        <div class="testimonial-meta">
-          <div class="testimonial-avatar">A</div>
-          <div><div class="testimonial-name">Aisha Osei-Mensah</div><div class="testimonial-handle">@aishao &#183; London</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div>
-        </div>
-        <blockquote class="testimonial-quote">Gold Dust catches light in a way that makes people stop mid-sentence. Worth every penny.</blockquote>
-      </div>
-      <div class="testimonial-slide">
-        <div class="testimonial-meta">
-          <div class="testimonial-avatar">L</div>
-          <div><div class="testimonial-name">L&#233;a Fontaine</div><div class="testimonial-handle">@leafonbeauty &#183; Lyon</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div>
-        </div>
-        <blockquote class="testimonial-quote">The 16-free formula convinced me to switch. The quality of every shade kept me loyal forever.</blockquote>
-      </div>
-      <div class="testimonial-slide">
-        <div class="testimonial-meta">
-          <div class="testimonial-avatar">R</div>
-          <div><div class="testimonial-name">Rima Al-Hassan</div><div class="testimonial-handle">@rimaesthetic &#183; Dubai</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div>
-        </div>
-        <blockquote class="testimonial-quote">Cherry Bomb is the boldest, most beautiful red. The formula is ethical and the colour is fearless.</blockquote>
-      </div>
+      <div class="testimonial-slide"><div class="testimonial-meta"><div class="testimonial-avatar">M</div><div><div class="testimonial-name">Margot Villeneuve</div><div class="testimonial-handle">@margotbeauty &#183; Paris</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div><blockquote class="testimonial-quote">Ruby Velvet is the only red I will ever wear. It changes how a room looks at you.</blockquote></div>
+      <div class="testimonial-slide"><div class="testimonial-meta"><div class="testimonial-avatar">S</div><div><div class="testimonial-name">Solange K.</div><div class="testimonial-handle">@solangek &#183; New York</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div><blockquote class="testimonial-quote">Midnight Plum lasted three full weeks without a single chip. I&#8217;ve never trusted a formula more.</blockquote></div>
+      <div class="testimonial-slide"><div class="testimonial-meta"><div class="testimonial-avatar">A</div><div><div class="testimonial-name">Aisha Osei-Mensah</div><div class="testimonial-handle">@aishao &#183; London</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div><blockquote class="testimonial-quote">Gold Dust catches light in a way that makes people stop mid-sentence. Worth every penny.</blockquote></div>
+      <div class="testimonial-slide"><div class="testimonial-meta"><div class="testimonial-avatar">L</div><div><div class="testimonial-name">L&#233;a Fontaine</div><div class="testimonial-handle">@leafonbeauty &#183; Lyon</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div><blockquote class="testimonial-quote">The 16-free formula convinced me to switch. The quality of every shade kept me loyal forever.</blockquote></div>
+      <div class="testimonial-slide"><div class="testimonial-meta"><div class="testimonial-avatar">R</div><div><div class="testimonial-name">Rima Al-Hassan</div><div class="testimonial-handle">@rimaesthetic &#183; Dubai</div><div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div></div></div><blockquote class="testimonial-quote">Cherry Bomb is the boldest, most beautiful red. The formula is ethical and the colour is fearless.</blockquote></div>
     </div>
-    <div class="testimonial-controls">
-      <button class="t-nav" id="t-prev">&#8592;</button>
-      <div class="t-dots" id="t-dots"></div>
-      <button class="t-nav" id="t-next">&#8594;</button>
-    </div>
+    <div class="testimonial-controls"><button class="t-nav" id="t-prev">&#8592;</button><div class="t-dots" id="t-dots"></div><button class="t-nav" id="t-next">&#8594;</button></div>
   </div>
 </section>
 
@@ -757,7 +551,7 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
     <div class="faq-item"><div class="faq-q">How long does Ruby Nails formula last? <span class="faq-icon">+</span></div><div class="faq-a">Our patented long-wear formula is engineered to last up to three weeks without chipping when applied correctly with a base and top coat.</div></div>
     <div class="faq-item"><div class="faq-q">What makes it 16-free? <span class="faq-icon">+</span></div><div class="faq-a">We&#8217;ve removed 16 commonly used toxic chemicals including formaldehyde, toluene, DBP, camphor, formaldehyde resin, xylene, ethyl tosylamide, parabens, and 8 more. Our formula is independently certified.</div></div>
     <div class="faq-item"><div class="faq-q">Is Ruby Nails vegan and cruelty-free? <span class="faq-icon">+</span></div><div class="faq-a">Yes &#8212; entirely. We are PETA-certified vegan and cruelty-free. No animal-derived ingredients, no animal testing, at any stage of production or supply chain.</div></div>
-    <div class="faq-item"><div class="faq-q">What&#8217;s your return policy? <span class="faq-icon">+</span></div><div class="faq-a">We offer a 30-day satisfaction guarantee. If you&#8217;re not completely satisfied, contact us and we&#8217;ll arrange a replacement or full refund, no questions asked.</div></div>
+    <div class="faq-item"><div class="faq-q">What&#8217;s your return policy? <span class="faq-icon">+</span></div><div class="faq-a">We offer a 30-day satisfaction guarantee. If you&#8217;re not completely satisfied, we&#8217;ll arrange a replacement or full refund, no questions asked.</div></div>
     <div class="faq-item"><div class="faq-q">How do I get the best results? <span class="faq-icon">+</span></div><div class="faq-a">Start with clean, oil-free nails. Apply our Ruby Base Coat, two thin coats of colour, and finish with our Glossy Top Coat. Reapply top coat every 3&#8211;4 days to extend wear.</div></div>
   </div>
 </section>
@@ -769,23 +563,11 @@ footer { background: var(--ink); color: rgba(255,255,255,0.5); padding: var(--sp
       <a href="#" class="nav-logo">Ruby <em style="color:var(--ruby-light)">Nails</em></a>
       <p class="footer-tagline">Luxury colour for those who choose with intention. 16-free, vegan, cruelty-free.</p>
     </div>
-    <div>
-      <div class="footer-col-title">Collection</div>
-      <ul class="footer-links"><li><a href="#">New Arrivals</a></li><li><a href="#">Bestsellers</a></li><li><a href="#">Shade Stories</a></li><li><a href="#">Gift Sets</a></li></ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Company</div>
-      <ul class="footer-links"><li><a href="#">Our Formula</a></li><li><a href="#">Sustainability</a></li><li><a href="#">Press</a></li><li><a href="#">Stockists</a></li></ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Support</div>
-      <ul class="footer-links"><li><a href="#">Shipping &amp; Returns</a></li><li><a href="#">FAQ</a></li><li><a href="#">Contact</a></li><li><a href="#">Wholesale</a></li></ul>
-    </div>
+    <div><div class="footer-col-title">Collection</div><ul class="footer-links"><li><a href="#">New Arrivals</a></li><li><a href="#">Bestsellers</a></li><li><a href="#">Shade Stories</a></li><li><a href="#">Gift Sets</a></li></ul></div>
+    <div><div class="footer-col-title">Company</div><ul class="footer-links"><li><a href="#">Our Formula</a></li><li><a href="#">Sustainability</a></li><li><a href="#">Press</a></li><li><a href="#">Stockists</a></li></ul></div>
+    <div><div class="footer-col-title">Support</div><ul class="footer-links"><li><a href="#">Shipping &amp; Returns</a></li><li><a href="#">FAQ</a></li><li><a href="#">Contact</a></li><li><a href="#">Wholesale</a></li></ul></div>
   </div>
-  <div class="footer-bottom">
-    <span>&#169; 2025 Ruby Nails. All rights reserved.</span>
-    <span><a href="#">Privacy</a> &#183; <a href="#">Terms</a> &#183; <a href="#">Cookies</a></span>
-  </div>
+  <div class="footer-bottom"><span>&#169; 2025 Ruby Nails. All rights reserved.</span><span><a href="#">Privacy</a> &#183; <a href="#">Terms</a> &#183; <a href="#">Cookies</a></span></div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous"></script>
@@ -799,12 +581,9 @@ const cursorRing = document.getElementById('cursor-ring');
 let mx = -100, my = -100, rx = -100, ry = -100;
 document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 (function animCursor() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  cursor.style.left = mx + 'px';
-  cursor.style.top = my + 'px';
-  cursorRing.style.left = rx + 'px';
-  cursorRing.style.top = ry + 'px';
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  cursorRing.style.left = rx + 'px'; cursorRing.style.top = ry + 'px';
   requestAnimationFrame(animCursor);
 })();
 document.querySelectorAll('a, button, [role="button"]').forEach(el => {
@@ -821,7 +600,7 @@ resizeTrail();
 window.addEventListener('resize', resizeTrail);
 document.addEventListener('mousemove', e => {
   for (let i = 0; i < 2; i++) {
-    particles.push({ x: e.clientX + (Math.random()-.5)*12, y: e.clientY + (Math.random()-.5)*12, r: Math.random()*3+1, alpha: 0.6+Math.random()*0.3, vx: (Math.random()-.5)*1.5, vy: -(Math.random()*2+0.5), hue: Math.random()>.5?350:43, life: 1 });
+    particles.push({ x: e.clientX+(Math.random()-.5)*12, y: e.clientY+(Math.random()-.5)*12, r: Math.random()*3+1, alpha: 0.6+Math.random()*0.3, vx: (Math.random()-.5)*1.5, vy: -(Math.random()*2+0.5), hue: Math.random()>.5?350:43, life: 1 });
   }
 });
 (function animTrail() {
@@ -829,10 +608,8 @@ document.addEventListener('mousemove', e => {
   particles = particles.filter(p => p.life > 0.02);
   for (const p of particles) {
     p.x += p.vx; p.y += p.vy; p.vy *= 0.97; p.life *= 0.93;
-    ctx2.beginPath();
-    ctx2.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2);
-    ctx2.fillStyle = 'hsla(' + p.hue + ',75%,60%,' + (p.alpha * p.life) + ')';
-    ctx2.fill();
+    ctx2.beginPath(); ctx2.arc(p.x, p.y, p.r*p.life, 0, Math.PI*2);
+    ctx2.fillStyle = 'hsla('+p.hue+',80%,65%,'+(p.alpha*p.life)+')'; ctx2.fill();
   }
   requestAnimationFrame(animTrail);
 })();
@@ -845,8 +622,7 @@ setTimeout(() => {
 }, 2200);
 
 // NAV
-const nav = document.getElementById('main-nav');
-window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); }, { passive: true });
+window.addEventListener('scroll', () => { document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 60); }, { passive: true });
 
 // PRODUCTS
 const PRODUCTS = [
@@ -855,8 +631,8 @@ const PRODUCTS = [
   { name: 'Midnight Plum', shade: 'Deep Violet', price: 24, color: '#2D1B4E', finish: 'Lacquer', isNew: false },
   { name: 'Cherry Bomb', shade: 'Bright Red', price: 24, color: '#C01830', finish: 'Gloss', isNew: false },
   { name: 'Coral Reef', shade: 'Warm Coral', price: 24, color: '#E07560', finish: 'Cream', isNew: true },
-  { name: 'Noir Absolu', shade: 'Jet Black', price: 24, color: '#1a1a1a', finish: 'Lacquer', isNew: false },
-  { name: 'Blush Theory', shade: 'Soft Pink', price: 24, color: '#E8B4B8', finish: 'Sheer', isNew: false },
+  { name: 'Noir Absolu', shade: 'Jet Black', price: 24, color: '#2a1a1a', finish: 'Lacquer', isNew: false },
+  { name: 'Blush Theory', shade: 'Soft Pink', price: 24, color: '#C87880', finish: 'Sheer', isNew: false },
   { name: 'Cayenne', shade: 'Burnt Orange', price: 24, color: '#C4501A', finish: 'Matte', isNew: true },
 ];
 
@@ -870,104 +646,53 @@ function darken(hex, amt) {
 const grid = document.getElementById('product-grid');
 PRODUCTS.forEach(p => {
   const card = document.createElement('div');
-  card.className = 'product-card reveal';
+  card.className = 'product-card';
   const dark = darken(p.color, 50);
   card.innerHTML =
     (p.isNew ? '<div class="product-new-tag">New</div>' : '') +
     '<button class="product-wishlist" title="Wishlist">&#x2661;</button>' +
     '<div class="product-visual"><div class="product-img-wrap">' +
-    '<svg width="60" height="180" viewBox="0 0 60 180" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-    '<ellipse cx="30" cy="171" rx="21" ry="5.5" fill="rgba(0,0,0,0.12)"/>' +
-    '<rect x="22" y="0" width="16" height="24" rx="2.5" fill="' + dark + '"/>' +
-    '<rect x="25" y="3" width="10" height="4" rx="1.5" fill="rgba(255,255,255,0.15)"/>' +
-    '<rect x="19" y="22" width="22" height="10" rx="2" fill="' + darken(p.color,35) + '"/>' +
-    '<path d="M14 32 Q12 42 12 52 L12 157 Q12 167 22 169 L38 169 Q48 167 48 157 L48 52 Q48 42 46 32 Z" fill="' + p.color + '"/>' +
-    '<path d="M18 36 Q17 44 17 52 L17 157" stroke="rgba(255,255,255,0.2)" stroke-width="3" stroke-linecap="round"/>' +
-    '<rect x="17" y="98" width="26" height="44" rx="2" fill="rgba(255,255,255,0.07)"/>' +
-    '<text x="30" y="122" font-size="5.5" fill="rgba(255,255,255,0.4)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="0.5">RUBY</text>' +
-    '<text x="30" y="131" font-size="4" fill="rgba(255,255,255,0.25)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="1">NAILS</text>' +
-    '<ellipse cx="30" cy="164" rx="18" ry="4" fill="' + darken(p.color,45) + '"/>' +
-    '</svg></div></div>' +
+    '<svg width="60" height="180" viewBox="0 0 60 180" fill="none"><ellipse cx="30" cy="171" rx="21" ry="5.5" fill="rgba(0,0,0,0.3)"/><rect x="22" y="0" width="16" height="24" rx="2.5" fill="'+dark+'"/><rect x="25" y="3" width="10" height="4" rx="1.5" fill="rgba(255,255,255,0.15)"/><rect x="19" y="22" width="22" height="10" rx="2" fill="'+darken(p.color,35)+'"/><path d="M14 32 Q12 42 12 52 L12 157 Q12 167 22 169 L38 169 Q48 167 48 157 L48 52 Q48 42 46 32 Z" fill="'+p.color+'"/><path d="M18 36 Q17 44 17 52 L17 157" stroke="rgba(255,255,255,0.2)" stroke-width="3" stroke-linecap="round"/><rect x="17" y="98" width="26" height="44" rx="2" fill="rgba(255,255,255,0.07)"/><text x="30" y="122" font-size="5.5" fill="rgba(255,255,255,0.4)" text-anchor="middle" font-family="Georgia,serif" letter-spacing="0.5">RUBY</text><text x="30" y="131" font-size="4" fill="rgba(255,255,255,0.25)" text-anchor="middle" font-family="Arial,sans-serif" letter-spacing="1">NAILS</text><ellipse cx="30" cy="164" rx="18" ry="4" fill="'+darken(p.color,45)+'"/></svg>' +
+    '</div></div>' +
     '<div class="product-info">' +
-    '<div class="product-shade-bar" style="background:linear-gradient(90deg,' + p.color + ',' + darken(p.color,-20) + ')"></div>' +
-    '<div class="product-name">' + p.name + '</div>' +
-    '<div class="product-shade">' + p.shade + ' &middot; ' + p.finish + '</div>' +
-    '<div class="product-footer">' +
-    '<span class="product-price">$' + p.price + '</span>' +
-    '<button class="product-add" onclick="addToCart(\'' + p.name + '\',' + p.price + ',\'' + p.color + '\')">+ Add</button>' +
-    '</div></div>';
+    '<div class="product-shade-bar" style="background:linear-gradient(90deg,'+p.color+','+darken(p.color,-20)+')"></div>' +
+    '<div class="product-name">'+p.name+'</div>' +
+    '<div class="product-shade">'+p.shade+' &middot; '+p.finish+'</div>' +
+    '<div class="product-footer"><span class="product-price">&#163;'+p.price+'</span>' +
+    '<button class="product-add" onclick="addToCart(\''+p.name+'\','+p.price+',\''+p.color+'\')">+ Add</button></div></div>';
   grid.appendChild(card);
 });
 
 // CART
 const cart = new Map();
-
 function addToCart(name, price, color) {
   if (cart.has(name)) { cart.get(name).qty++; } else { cart.set(name, { price, color, qty: 1 }); }
-  updateCartUI();
-  openCart();
+  updateCartUI(); openCart();
 }
-
 function updateCartUI() {
-  const total = [...cart.values()].reduce((s,i) => s + i.price * i.qty, 0);
-  const count = [...cart.values()].reduce((s,i) => s + i.qty, 0);
+  const total = [...cart.values()].reduce((s,i) => s+i.price*i.qty, 0);
+  const count = [...cart.values()].reduce((s,i) => s+i.qty, 0);
   const countEl = document.getElementById('cart-count');
-  countEl.textContent = count;
-  countEl.classList.toggle('visible', count > 0);
-  document.getElementById('cart-total').textContent = '$' + total.toFixed(2);
+  countEl.textContent = count; countEl.classList.toggle('visible', count > 0);
+  document.getElementById('cart-total').textContent = '£'+total.toFixed(2);
   renderCartItems();
 }
-
 function renderCartItems() {
   const list = document.getElementById('cart-items-list');
-  if (cart.size === 0) {
-    list.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">&#9675;</div><div class="cart-empty-text">Your cart is beautifully empty</div></div>';
-    return;
-  }
+  if (cart.size === 0) { list.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">&#9675;</div><div class="cart-empty-text">Your cart is beautifully empty</div></div>'; return; }
   list.innerHTML = '';
   cart.forEach((item, name) => {
-    const el = document.createElement('div');
-    el.className = 'cart-item';
-    el.innerHTML =
-      '<div class="cart-item-img"><svg width="40" height="80" viewBox="0 0 40 80" fill="none">' +
-      '<rect x="13" y="0" width="14" height="13" rx="1.5" fill="' + darken(item.color,50) + '"/>' +
-      '<rect x="11" y="12" width="18" height="7" rx="1" fill="' + darken(item.color,35) + '"/>' +
-      '<path d="M8 19 Q6 25 6 30 L6 72 Q6 77 14 78 L26 78 Q34 77 34 72 L34 30 Q34 25 32 19Z" fill="' + item.color + '"/>' +
-      '<path d="M11 21 Q10 25 10 30 L10 72" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>' +
-      '</svg></div>' +
-      '<div><div class="cart-item-name">' + name + '</div>' +
-      '<div class="cart-item-shade">Nail Polish &middot; 15ml</div>' +
-      '<div class="cart-qty">' +
-      '<button class="qty-btn" onclick="changeQty(\'' + name + '\',-1)">&#8722;</button>' +
-      '<span class="qty-display">' + item.qty + '</span>' +
-      '<button class="qty-btn" onclick="changeQty(\'' + name + '\',1)">+</button>' +
-      '</div><button class="cart-remove" onclick="removeItem(\'' + name + '\')">Remove</button></div>' +
-      '<div class="cart-item-price">$' + (item.price * item.qty).toFixed(2) + '</div>';
+    const el = document.createElement('div'); el.className = 'cart-item';
+    el.innerHTML = '<div class="cart-item-img"><svg width="40" height="80" viewBox="0 0 40 80" fill="none"><rect x="13" y="0" width="14" height="13" rx="1.5" fill="'+darken(item.color,50)+'"/><rect x="11" y="12" width="18" height="7" rx="1" fill="'+darken(item.color,35)+'"/><path d="M8 19 Q6 25 6 30 L6 72 Q6 77 14 78 L26 78 Q34 77 34 72 L34 30 Q34 25 32 19Z" fill="'+item.color+'"/><path d="M11 21 Q10 25 10 30 L10 72" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/></svg></div>' +
+      '<div><div class="cart-item-name">'+name+'</div><div class="cart-item-shade">Nail Polish &middot; 15ml</div><div class="cart-qty"><button class="qty-btn" onclick="changeQty(\''+name+'\',-1)">&#8722;</button><span class="qty-display">'+item.qty+'</span><button class="qty-btn" onclick="changeQty(\''+name+'\',1)">+</button></div><button class="cart-remove" onclick="removeItem(\''+name+'\')">Remove</button></div>' +
+      '<div class="cart-item-price">&#163;'+(item.price*item.qty).toFixed(2)+'</div>';
     list.appendChild(el);
   });
 }
-
-function changeQty(name, delta) {
-  const item = cart.get(name);
-  if (!item) return;
-  item.qty = Math.max(0, item.qty + delta);
-  if (item.qty === 0) cart.delete(name);
-  updateCartUI();
-}
-
+function changeQty(name, delta) { const item = cart.get(name); if (!item) return; item.qty = Math.max(0, item.qty+delta); if (item.qty===0) cart.delete(name); updateCartUI(); }
 function removeItem(name) { cart.delete(name); updateCartUI(); }
-
-function openCart() {
-  document.getElementById('cart-drawer').classList.add('open');
-  document.getElementById('cart-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeCart() {
-  document.getElementById('cart-drawer').classList.remove('open');
-  document.getElementById('cart-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
+function openCart() { document.getElementById('cart-drawer').classList.add('open'); document.getElementById('cart-overlay').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeCart() { document.getElementById('cart-drawer').classList.remove('open'); document.getElementById('cart-overlay').classList.remove('open'); document.body.style.overflow=''; }
 document.getElementById('cart-btn').addEventListener('click', openCart);
 document.getElementById('cart-close').addEventListener('click', closeCart);
 document.getElementById('cart-overlay').addEventListener('click', closeCart);
@@ -977,23 +702,23 @@ const tTrack = document.getElementById('testimonial-track');
 const tDots = document.getElementById('t-dots');
 const tSlides = tTrack.querySelectorAll('.testimonial-slide');
 let tIdx = 0;
-tSlides.forEach((_, i) => {
+tSlides.forEach((_,i) => {
   const dot = document.createElement('button');
-  dot.className = 't-dot' + (i === 0 ? ' active' : '');
-  dot.setAttribute('aria-label', 'Testimonial ' + (i+1));
+  dot.className = 't-dot'+(i===0?' active':'');
+  dot.setAttribute('aria-label','Testimonial '+(i+1));
   dot.addEventListener('click', () => goToT(i));
   tDots.appendChild(dot);
 });
 function goToT(i) {
-  tIdx = (i + tSlides.length) % tSlides.length;
-  tTrack.style.transform = 'translateX(-' + (tIdx * 100) + '%)';
-  tDots.querySelectorAll('.t-dot').forEach((d,j) => d.classList.toggle('active', j === tIdx));
+  tIdx = (i+tSlides.length)%tSlides.length;
+  tTrack.style.transform = 'translateX(-'+(tIdx*100)+'%)';
+  tDots.querySelectorAll('.t-dot').forEach((d,j) => d.classList.toggle('active',j===tIdx));
 }
-document.getElementById('t-prev').addEventListener('click', () => goToT(tIdx - 1));
-document.getElementById('t-next').addEventListener('click', () => goToT(tIdx + 1));
-let tAuto = setInterval(() => goToT(tIdx + 1), 6000);
+document.getElementById('t-prev').addEventListener('click', () => goToT(tIdx-1));
+document.getElementById('t-next').addEventListener('click', () => goToT(tIdx+1));
+let tAuto = setInterval(() => goToT(tIdx+1), 6000);
 tTrack.addEventListener('mouseenter', () => clearInterval(tAuto));
-tTrack.addEventListener('mouseleave', () => { tAuto = setInterval(() => goToT(tIdx + 1), 6000); });
+tTrack.addEventListener('mouseleave', () => { tAuto = setInterval(() => goToT(tIdx+1), 6000); });
 
 // FAQ
 document.querySelectorAll('.faq-q').forEach(q => {
@@ -1016,33 +741,108 @@ const ringObs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       const fill = e.target.querySelector('.ring-fill');
-      if (fill) {
-        const pct = parseFloat(fill.dataset.pct) / 100;
-        fill.style.strokeDashoffset = 283 * (1 - pct);
-      }
+      if (fill) fill.style.strokeDashoffset = 283*(1-parseFloat(fill.dataset.pct)/100);
       ringObs.unobserve(e.target);
     }
   });
 }, { threshold: 0.3 });
 document.querySelectorAll('.stat-item').forEach(el => ringObs.observe(el));
 
-// GSAP SHADE STORIES (horizontal pin)
+// GSAP SCROLL ANIMATIONS
 window.addEventListener('load', () => {
-  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+  if (typeof gsap === 'undefined') return;
   gsap.registerPlugin(ScrollTrigger);
+
+  // SHADE STORIES — horizontal pin
   const track = document.querySelector('.shade-track');
   const slides = document.querySelectorAll('.shade-slide');
   gsap.to(track, {
-    x: () => '-' + ((slides.length - 1) * 100) + 'vw',
+    x: () => '-'+((slides.length-1)*100)+'vw',
     ease: 'none',
-    scrollTrigger: {
-      trigger: '#shade-pin-target',
-      start: 'top top',
-      end: () => '+=' + (slides.length * 100) + 'vh',
-      pin: true,
-      scrub: 1,
-      anticipatePin: 1,
-    }
+    scrollTrigger: { trigger: '#shade-pin-target', start: 'top top', end: () => '+='+slides.length*100+'vh', pin: true, scrub: 1, anticipatePin: 1 }
+  });
+
+  // HERO BLOBS — parallax at different speeds
+  gsap.to('#blob1', { y: '-25%', ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('#blob2', { y: '-40%', ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('#blob3', { y: '-30%', x: '10%', ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('#blob4', { y: '-20%', ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+
+  // HERO CARD — slight float up on scroll
+  gsap.to('#hero-card', { y: '-8%', ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 } });
+
+  // STATS — slide in with rotation from below + stagger
+  gsap.from('.stat-item', {
+    y: 80, rotation: 6, opacity: 0, stagger: 0.15, ease: 'back.out(1.4)',
+    scrollTrigger: { trigger: '#stats', start: 'top 80%', toggleActions: 'play none none reverse' }
+  });
+
+  // PRODUCT CARDS — fan out from sides, alternating
+  gsap.utils.toArray('.product-card').forEach((card, i) => {
+    const fromLeft = i % 2 === 0;
+    gsap.from(card, {
+      x: fromLeft ? -80 : 80, rotation: fromLeft ? -4 : 4, opacity: 0, scale: 0.92,
+      duration: 0.7, ease: 'power3.out',
+      scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none reverse' }
+    });
+  });
+
+  // BENEFIT ITEMS — slide from left with stagger + slight rotation
+  gsap.from('.benefit-item', {
+    x: -60, rotation: -3, opacity: 0, stagger: 0.12, ease: 'power3.out',
+    scrollTrigger: { trigger: '.formula-benefits', start: 'top 78%', toggleActions: 'play none none reverse' }
+  });
+
+  // FORMULA BOTTLE — rises as section enters + floats on scroll
+  gsap.from('#formula-bottle', {
+    y: 100, rotation: -8, opacity: 0, ease: 'power4.out',
+    scrollTrigger: { trigger: '#formula', start: 'top 75%', toggleActions: 'play none none reverse' }
+  });
+  gsap.to('#formula-bottle', {
+    y: '-15%', ease: 'none',
+    scrollTrigger: { trigger: '#formula', start: 'top bottom', end: 'bottom top', scrub: 1 }
+  });
+
+  // SHADE NAME TEXT — slides in from opposite direction of bottle
+  slides.forEach(slide => {
+    gsap.from(slide.querySelector('.shade-name'), {
+      x: -50, opacity: 0, duration: 0.8, ease: 'power3.out',
+      scrollTrigger: { trigger: slide, start: 'top 80%', toggleActions: 'play none none reverse' }
+    });
+  });
+
+  // TESTIMONIALS — slides in from right
+  gsap.from('.testimonial-slider', {
+    x: 60, opacity: 0, ease: 'power3.out',
+    scrollTrigger: { trigger: '#testimonials', start: 'top 75%', toggleActions: 'play none none reverse' }
+  });
+
+  // FAQ ITEMS — stagger in from below with slight skew
+  gsap.from('.faq-item', {
+    y: 40, skewY: 2, opacity: 0, stagger: 0.1, ease: 'power3.out',
+    scrollTrigger: { trigger: '#faq', start: 'top 80%', toggleActions: 'play none none reverse' }
+  });
+
+  // SECTION HEADERS — scale up from slightly below
+  gsap.utils.toArray('.section-header').forEach(el => {
+    gsap.from(el, {
+      y: 50, scale: 0.96, opacity: 0, ease: 'power3.out', duration: 0.9,
+      scrollTrigger: { trigger: el, start: 'top 82%', toggleActions: 'play none none reverse' }
+    });
+  });
+
+  // SHADE BOTTLES — scale up dramatically as each slide becomes active
+  gsap.utils.toArray('.shade-bottle-wrap').forEach((b, i) => {
+    gsap.from(b, {
+      scale: 0.6, rotation: 12, opacity: 0, ease: 'power4.out',
+      scrollTrigger: { trigger: b.closest('.shade-slide'), start: 'top 70%', toggleActions: 'play none none reverse' }
+    });
+  });
+
+  // FOOTER — push up from below
+  gsap.from('footer', {
+    y: 60, opacity: 0, ease: 'power3.out',
+    scrollTrigger: { trigger: 'footer', start: 'top 90%', toggleActions: 'play none none reverse' }
   });
 });
 </script>
