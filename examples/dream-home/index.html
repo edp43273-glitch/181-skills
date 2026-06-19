@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dream Home — Plan Studies</title>
+<style>
+  :root{
+    --paper:#f4f1ea;
+    --paper-2:#ece7db;
+    --ink:#1c2733;
+    --ink-soft:#43505e;
+    --line:#2a3845;
+    --clay:#b5613b;
+    --clay-soft:#c9805f;
+    --sage:#6d7d5b;
+    --water:#5b8aa6;
+    --gold:#a8853f;
+    --grid:#cfc8b8;
+    --shadow:0 18px 40px -18px rgba(28,39,51,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(circle at 20% 0%, #faf8f2, transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:6rem;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 1.5rem}
+
+  /* ---- Masthead ---- */
+  header.mast{
+    padding:4.5rem 0 2.5rem;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:3rem;
+    position:relative;
+  }
+  .mast .eyebrow{
+    font-size:.72rem;letter-spacing:.42em;text-transform:uppercase;
+    color:var(--clay);font-weight:600;margin-bottom:1rem;
+  }
+  .mast h1{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:clamp(2.4rem,1.2rem+4vw,4.4rem);
+    line-height:1.02;font-weight:600;letter-spacing:-.01em;
+  }
+  .mast h1 em{color:var(--clay);font-style:italic}
+  .mast .sub{
+    margin-top:1.4rem;max-width:60ch;color:var(--ink-soft);font-size:1.05rem;
+  }
+  .specbar{
+    display:flex;flex-wrap:wrap;gap:1.6rem 2.8rem;margin-top:2.4rem;
+    padding-top:1.8rem;border-top:1px solid var(--grid);
+  }
+  .specbar div{min-width:90px}
+  .specbar .n{font-family:Georgia,serif;font-size:1.7rem;color:var(--ink);font-weight:600;line-height:1}
+  .specbar .l{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-top:.4rem}
+
+  /* ---- Section headers ---- */
+  .sheet{margin-bottom:4.5rem}
+  .sheet-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:.4rem}
+  .sheet-tag{
+    font-family:'Courier New',monospace;font-size:.8rem;font-weight:700;
+    color:#fff;background:var(--ink);padding:.25rem .6rem;border-radius:3px;letter-spacing:.05em;
+  }
+  .sheet h2{
+    font-family:Georgia,serif;font-size:clamp(1.5rem,1rem+2vw,2.2rem);
+    font-weight:600;letter-spacing:-.01em;
+  }
+  .sheet .lede{color:var(--ink-soft);max-width:70ch;margin:.6rem 0 1.8rem}
+
+  /* ---- Drawing card ---- */
+  .draw{
+    background:#fbfaf6;
+    border:1px solid var(--ink);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .draw-title{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;
+    padding:.85rem 1.2rem;border-bottom:1px solid var(--line);
+    background:var(--ink);color:var(--paper);
+    font-family:'Courier New',monospace;font-size:.78rem;letter-spacing:.08em;
+  }
+  .draw-title b{font-weight:700;letter-spacing:.12em}
+  .draw-title span{opacity:.75}
+  .draw-body{padding:1.4rem;display:block}
+  svg{display:block;width:100%;height:auto;background:
+      linear-gradient(var(--grid) 1px,transparent 1px) 0 0/100% 28px,
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/28px 100%,
+      #fbfaf6;
+    background-blend-mode:multiply;border:1px solid var(--grid);border-radius:2px;}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;margin-top:1rem;font-size:.82rem;color:var(--ink-soft);
+  }
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:.4rem;vertical-align:-2px;border:1px solid rgba(0,0,0,.15)}
+
+  /* room fills via svg classes */
+  .rm{stroke:var(--line);stroke-width:1.5;}
+  .rm-live{fill:#efe9da}
+  .rm-priv{fill:#e8ece2}
+  .rm-wet{fill:#dfe8ed}
+  .rm-util{fill:#e9e4d6}
+  .rm-out{fill:#e4ebe0}
+  .rm-gar{fill:#e6e2d6}
+  .lbl{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;fill:var(--ink);text-anchor:middle}
+  .dim{font-family:'Courier New',monospace;font-size:9px;fill:var(--ink-soft);text-anchor:middle}
+  .wall{fill:none;stroke:var(--ink);stroke-width:4}
+  .door{stroke:var(--clay);stroke-width:1.5;fill:none}
+
+  /* site plan classes */
+  .land{fill:#e4ebe0;stroke:var(--sage);stroke-width:1.5}
+  .lawn{fill:#dfe9d6}
+  .wood{fill:#cdd9bf}
+  .house{fill:#cdb89a;stroke:var(--ink);stroke-width:2}
+  .pool{fill:#7fb0c9;stroke:var(--water);stroke-width:1.5}
+  .court{fill:#7a9e74;stroke:#4f6b4a;stroke-width:1.5}
+  .drive{fill:#d8d2c4;stroke:#b3a98f;stroke-width:1}
+  .slbl{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;fill:var(--ink);text-anchor:middle}
+  .slbl-w{fill:#fff}
+  .sdim{font-family:'Courier New',monospace;font-size:10px;fill:var(--ink-soft);text-anchor:middle}
+  .road{fill:#41454b}
+  .roadline{stroke:#e8d56a;stroke-width:1.5;stroke-dasharray:8 8;fill:none}
+
+  table.cost{width:100%;border-collapse:collapse;margin-top:1rem;font-size:.92rem}
+  table.cost th,table.cost td{padding:.6rem .8rem;text-align:left;border-bottom:1px solid var(--grid)}
+  table.cost th{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  table.cost td:last-child,table.cost th:last-child{text-align:right;font-family:'Courier New',monospace}
+  table.cost tr.tot td{font-weight:700;border-top:2px solid var(--ink);border-bottom:none}
+
+  .note{
+    background:var(--paper-2);border-left:3px solid var(--clay);
+    padding:1rem 1.2rem;border-radius:0 4px 4px 0;margin-top:1.4rem;font-size:.92rem;color:var(--ink-soft);
+  }
+  .note b{color:var(--ink)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+
+  footer{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--grid);font-size:.82rem;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="eyebrow">Plan Studies &middot; Carolinas / Tennessee / East Texas</div>
+    <h1>The <em>Dream</em> House<br>&amp; Grounds</h1>
+    <p class="sub">Five layout studies for a ~4,800 sq ft custom residence on a 5&ndash;8 acre plot, scaled to a working budget of approximately $1.6M. Drawings are dimensioned and to scale.</p>
+    <div class="specbar">
+      <div><div class="n">4,800</div><div class="l">Sq Ft Heated</div></div>
+      <div><div class="n">5</div><div class="l">Bedrooms</div></div>
+      <div><div class="n">4.5</div><div class="l">Bathrooms</div></div>
+      <div><div class="n">6</div><div class="l">Acres</div></div>
+      <div><div class="n">3</div><div class="l">Car Garage</div></div>
+      <div><div class="n">2</div><div class="l">Storeys</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ SITE PLAN A ============ -->
+  <section class="sheet" id="site-a">
+    <div class="sheet-head">
+      <span class="sheet-tag">A-01</span>
+      <h2>Site Plan &mdash; &ldquo;The Long Approach&rdquo;</h2>
+    </div>
+    <p class="lede">A 6-acre rectangular parcel (approx. 510&prime; &times; 512&prime;). The house sits deep&mdash;280&prime; back from the road&mdash;behind a curving drive and a screen of trees, so you never see headlights from the house. Pool and outdoor living wrap the rear; tennis court tucks into the southeast corner with its own tree buffer.</p>
+    <div class="draw">
+      <div class="draw-title"><b>SITE PLAN A</b> <span>6.0 AC &middot; 510&prime;&times;512&prime; &middot; SCALE 1&Prime;=80&prime;</span></div>
+      <div class="draw-body">
+        <svg viewBox="0 0 720 720" role="img" aria-label="Site plan A">
+          <!-- parcel -->
+          <rect class="land" x="20" y="20" width="680" height="660"/>
+          <!-- perimeter woodland buffer -->
+          <path class="wood" d="M20 20 H700 V680 H20 Z M70 70 V630 H650 V70 Z" fill-rule="evenodd" opacity=".6"/>
+          <!-- main lawn -->
+          <rect class="lawn" x="70" y="70" width="580" height="560" opacity=".55"/>
+          <!-- road -->
+          <rect class="road" x="0" y="688" width="720" height="32"/>
+          <line class="roadline" x1="0" y1="704" x2="720" y2="704"/>
+          <text x="360" y="711" class="sdim slbl-w" style="font-size:9px">COUNTY ROAD</text>
+          <!-- gated entrance -->
+          <rect x="338" y="672" width="44" height="16" fill="#b3a98f"/>
+          <text x="360" y="666" class="sdim">GATE</text>
+          <!-- curving driveway -->
+          <path class="drive" d="M345 688 C345 600 250 580 250 500 C250 430 360 430 400 380 L470 320 L500 350 L430 410 C360 470 290 470 300 540 C305 600 380 610 380 688 Z" opacity=".9"/>
+          <!-- house -->
+          <rect class="house" x="300" y="250" width="170" height="110" rx="2"/>
+          <text x="385" y="300" class="slbl slbl-w">RESIDENCE</text>
+          <text x="385" y="316" class="sdim slbl-w" style="font-size:9px">4,800 SF</text>
+          <!-- garage wing -->
+          <rect class="house" x="300" y="250" width="46" height="70" opacity=".85"/>
+          <text x="323" y="288" class="sdim slbl-w" style="font-size:8px">GAR</text>
+          <!-- motor court -->
+          <ellipse class="drive" cx="290" cy="320" rx="46" ry="34" opacity=".9"/>
+          <!-- rear covered porch -->
+          <rect x="300" y="360" width="170" height="22" fill="#cbb9a0" stroke="#8a7a5e"/>
+          <text x="385" y="375" class="sdim" style="font-size:8px">COVERED PORCH</text>
+          <!-- pool + deck -->
+          <rect x="300" y="392" width="150" height="86" rx="4" fill="#cdd7c4" stroke="#9aa888"/>
+          <rect class="pool" x="320" y="404" width="74" height="50" rx="6"/>
+          <text x="357" y="433" class="sdim slbl-w" style="font-size:9px">POOL</text>
+          <text x="420" y="470" class="sdim" style="font-size:8px">DECK / SPA</text>
+          <!-- tennis court SE corner -->
+          <rect class="court" x="486" y="486" width="120" height="60" rx="2"/>
+          <line x1="546" y1="486" x2="546" y2="546" stroke="#fff" stroke-width="1"/>
+          <rect x="496" y="496" width="100" height="40" fill="none" stroke="#fff" stroke-width=".8"/>
+          <text x="546" y="560" class="sdim">TENNIS 120&prime;&times;60&prime;</text>
+          <!-- garden / orchard -->
+          <text x="160" y="180" class="slbl" style="font-size:11px">MEADOW / ORCHARD</text>
+          <text x="160" y="196" class="sdim">~2.4 ac open</text>
+          <text x="560" y="180" class="slbl" style="font-size:11px">LAWN</text>
+          <!-- dimension lines -->
+          <text x="360" y="44" class="sdim">510&prime; FRONTAGE</text>
+          <text x="38" y="350" class="sdim" transform="rotate(-90 38 350)">512&prime; DEPTH</text>
+          <text x="385" y="234" class="sdim">setback 280&prime; from road</text>
+          <!-- north arrow -->
+          <g transform="translate(660,60)">
+            <circle r="20" fill="#fbfaf6" stroke="var(--ink)"/>
+            <path d="M0 -14 L6 8 L0 3 L-6 8 Z" fill="var(--clay)"/>
+            <text y="22" class="sdim" style="font-weight:700">N</text>
+          </g>
+          <!-- scale bar -->
+          <g transform="translate(70,650)">
+            <rect width="80" height="6" fill="var(--ink)"/>
+            <rect width="40" height="6" fill="#fbfaf6" stroke="var(--ink)"/>
+            <text x="0" y="20" class="sdim" style="text-anchor:start">0</text>
+            <text x="80" y="20" class="sdim">160&prime;</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><i style="background:#cdb89a"></i>Residence + garage</span>
+          <span><i style="background:#7fb0c9"></i>Pool / spa</span>
+          <span><i style="background:#7a9e74"></i>Tennis court</span>
+          <span><i style="background:#d8d2c4"></i>Drive / motor court</span>
+          <span><i style="background:#dfe9d6"></i>Lawn / meadow</span>
+          <span><i style="background:#cdd9bf"></i>Woodland buffer</span>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b>Why this works:</b> The deep setback is the single biggest driver of the &ldquo;estate&rdquo; feeling, and it costs almost nothing&mdash;just driveway length (budget ~$18&ndash;25/linear ft for a quality paved drive, so a 600&prime; drive runs $11&ndash;15k). Keeping the pool and tennis court on the same side as the house clusters utilities and fencing, saving money versus scattering them across the parcel.</div>
+  </section>
+
+  <!-- ============ SITE PLAN B ============ -->
+  <section class="sheet" id="site-b">
+    <div class="sheet-head">
+      <span class="sheet-tag">A-02</span>
+      <h2>Site Plan &mdash; &ldquo;The Courtyard Compound&rdquo;</h2>
+    </div>
+    <p class="lede">A squarer 7-acre parcel arranged around a central courtyard. The garage is detached and linked by a breezeway, creating a sheltered auto-court. This layout suits a flatter lot and gives a more contemporary, resort-like organisation&mdash;everything opens onto the pool courtyard.</p>
+    <div class="draw">
+      <div class="draw-title"><b>SITE PLAN B</b> <span>7.0 AC &middot; 552&prime;&times;552&prime; &middot; SCALE 1&Prime;=85&prime;</span></div>
+      <div class="draw-body">
+        <svg viewBox="0 0 720 720" role="img" aria-label="Site plan B">
+          <rect class="land" x="20" y="20" width="680" height="660"/>
+          <rect class="lawn" x="64" y="64" width="592" height="572" opacity=".5"/>
+          <path class="wood" d="M20 20 H700 V680 H20 Z M64 64 V636 H656 V64 Z" fill-rule="evenodd" opacity=".55"/>
+          <!-- road left side this time -->
+          <rect class="road" x="0" y="0" width="32" height="720"/>
+          <line class="roadline" x1="16" y1="0" x2="16" y2="720"/>
+          <text x="16" y="360" class="sdim slbl-w" style="font-size:9px" transform="rotate(-90 16 360)">COUNTY ROAD</text>
+          <rect x="20" y="338" width="16" height="44" fill="#b3a98f"/>
+          <text x="54" y="330" class="sdim">GATE</text>
+          <!-- straight then forking drive -->
+          <path class="drive" d="M32 350 H200 V300 H250 V410 H200 V370 H32 Z" opacity=".9"/>
+          <!-- auto court -->
+          <rect class="drive" x="250" y="300" width="120" height="110" rx="4" opacity=".85"/>
+          <text x="310" y="358" class="sdim">AUTO COURT</text>
+          <!-- detached garage -->
+          <rect class="house" x="250" y="250" width="120" height="46"/>
+          <text x="310" y="278" class="slbl slbl-w" style="font-size:10px">GARAGE 3-CAR</text>
+          <!-- breezeway -->
+          <rect x="392" y="262" width="20" height="22" fill="#cbb9a0" stroke="#8a7a5e"/>
+          <!-- main house (L-shape around courtyard) -->
+          <path class="house" d="M380 250 H560 V300 H470 V470 H380 Z"/>
+          <text x="430" y="290" class="slbl slbl-w">RESIDENCE</text>
+          <text x="430" y="306" class="sdim slbl-w" style="font-size:9px">4,800 SF</text>
+          <!-- courtyard pool -->
+          <rect x="470" y="300" width="150" height="170" rx="4" fill="#cdd7c4" stroke="#9aa888"/>
+          <rect class="pool" x="488" y="320" width="80" height="60" rx="6"/>
+          <text x="528" y="354" class="sdim slbl-w" style="font-size:9px">POOL</text>
+          <text x="540" y="420" class="sdim" style="font-size:8px">COURTYARD DECK</text>
+          <!-- tennis far rear -->
+          <rect class="court" x="470" y="500" width="120" height="60" rx="2"/>
+          <line x1="530" y1="500" x2="530" y2="560" stroke="#fff" stroke-width="1"/>
+          <text x="530" y="574" class="sdim">TENNIS 120&prime;&times;60&prime;</text>
+          <!-- gardens -->
+          <text x="180" y="170" class="slbl" style="font-size:11px">FRONT PASTURE</text>
+          <text x="180" y="186" class="sdim">~3 ac open</text>
+          <text x="180" y="520" class="slbl" style="font-size:11px">KITCHEN GARDEN</text>
+          <text x="180" y="536" class="sdim">+ orchard</text>
+          <!-- dims -->
+          <text x="360" y="44" class="sdim">552&prime;</text>
+          <text x="690" y="360" class="sdim" transform="rotate(90 690 360)">552&prime;</text>
+          <!-- north -->
+          <g transform="translate(660,60)">
+            <circle r="20" fill="#fbfaf6" stroke="var(--ink)"/>
+            <path d="M0 -14 L6 8 L0 3 L-6 8 Z" fill="var(--clay)"/>
+            <text y="22" class="sdim" style="font-weight:700">N</text>
+          </g>
+          <g transform="translate(60,650)">
+            <rect width="80" height="6" fill="var(--ink)"/>
+            <rect width="40" height="6" fill="#fbfaf6" stroke="var(--ink)"/>
+            <text x="0" y="20" class="sdim" style="text-anchor:start">0</text>
+            <text x="80" y="20" class="sdim">170&prime;</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><i style="background:#cdb89a"></i>Residence + detached garage</span>
+          <span><i style="background:#7fb0c9"></i>Courtyard pool</span>
+          <span><i style="background:#7a9e74"></i>Tennis court</span>
+          <span><i style="background:#d8d2c4"></i>Auto court / drive</span>
+          <span><i style="background:#dfe9d6"></i>Pasture / garden</span>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b>Trade-off:</b> A detached garage + breezeway costs roughly $40&ndash;70k more than an attached garage (separate foundation, roof, and the breezeway structure). You buy architectural drama and a sheltered courtyard for it. If budget is tight, Plan A&rsquo;s attached garage is the saving.</div>
+  </section>
+
+  <!-- ============ MAIN FLOOR ============ -->
+  <section class="sheet" id="main-floor">
+    <div class="sheet-head">
+      <span class="sheet-tag">A-03</span>
+      <h2>Main Floor Plan</h2>
+    </div>
+    <p class="lede">~2,950 sq ft. A single open volume runs kitchen&ndash;dining&ndash;great room across the rear, opening to the covered porch and pool. The primary suite sits on the main floor (increasingly the #1 request in the Southeast), with a secondary guest suite / office also down. Mudroom buffers the garage from the living space.</p>
+    <div class="draw">
+      <div class="draw-title"><b>MAIN FLOOR</b> <span>2,950 SF &middot; SCALE 1&Prime;=10&prime; &middot; 3-CAR GARAGE</span></div>
+      <div class="draw-body">
+        <svg viewBox="0 0 760 540" role="img" aria-label="Main floor plan">
+          <!-- outer wall -->
+          <rect class="wall" x="40" y="40" width="680" height="440"/>
+          <!-- GARAGE (left wing) -->
+          <rect class="rm rm-gar" x="42" y="42" width="180" height="240"/>
+          <text x="132" y="158" class="lbl">3-CAR GARAGE</text>
+          <text x="132" y="174" class="dim">32&prime; &times; 24&prime;</text>
+          <!-- mudroom + pantry between garage and kitchen -->
+          <rect class="rm rm-util" x="222" y="42" width="90" height="110"/>
+          <text x="267" y="92" class="lbl">MUD</text>
+          <text x="267" y="107" class="dim">10&prime;&times;11&prime;</text>
+          <rect class="rm rm-util" x="222" y="152" width="90" height="80"/>
+          <text x="267" y="188" class="lbl">PANTRY</text>
+          <text x="267" y="203" class="dim">9&prime;&times;8&prime;</text>
+          <!-- powder -->
+          <rect class="rm rm-wet" x="222" y="232" width="90" height="50"/>
+          <text x="267" y="260" class="lbl">PWDR</text>
+          <!-- KITCHEN -->
+          <rect class="rm rm-live" x="312" y="42" width="180" height="150"/>
+          <text x="402" y="108" class="lbl">KITCHEN</text>
+          <text x="402" y="124" class="dim">18&prime; &times; 16&prime;</text>
+          <!-- island -->
+          <rect x="342" y="150" width="120" height="26" rx="4" fill="#d8cdb4" stroke="var(--line)"/>
+          <text x="402" y="167" class="dim">ISLAND</text>
+          <!-- DINING -->
+          <rect class="rm rm-live" x="492" y="42" width="160" height="150"/>
+          <text x="572" y="108" class="lbl">DINING</text>
+          <text x="572" y="124" class="dim">16&prime; &times; 15&prime;</text>
+          <!-- GREAT ROOM -->
+          <rect class="rm rm-live" x="312" y="192" width="220" height="170"/>
+          <text x="422" y="270" class="lbl">GREAT ROOM</text>
+          <text x="422" y="286" class="dim">22&prime; &times; 20&prime;</text>
+          <!-- fireplace -->
+          <rect x="312" y="300" width="10" height="50" fill="var(--clay)"/>
+          <!-- FOYER + stairs -->
+          <rect class="rm rm-util" x="532" y="192" width="120" height="90"/>
+          <text x="592" y="232" class="lbl">FOYER</text>
+          <text x="592" y="247" class="dim">stair up &uarr;</text>
+          <!-- stair treads -->
+          <g stroke="var(--line)" stroke-width="1">
+            <line x1="600" y1="200" x2="648" y2="200"/>
+            <line x1="600" y1="210" x2="648" y2="210"/>
+            <line x1="600" y1="220" x2="648" y2="220"/>
+            <line x1="600" y1="230" x2="648" y2="230"/>
+            <line x1="600" y1="240" x2="648" y2="240"/>
+            <line x1="600" y1="250" x2="648" y2="250"/>
+          </g>
+          <!-- GUEST SUITE / OFFICE -->
+          <rect class="rm rm-priv" x="532" y="282" width="120" height="80"/>
+          <text x="592" y="316" class="lbl">GUEST/OFFICE</text>
+          <text x="592" y="331" class="dim">13&prime;&times;13&prime; +ensuite</text>
+          <rect class="rm rm-wet" x="612" y="282" width="40" height="40"/>
+          <!-- PRIMARY SUITE (bottom) -->
+          <rect class="rm rm-priv" x="42" y="282" width="270" height="198"/>
+          <text x="150" y="372" class="lbl">PRIMARY SUITE</text>
+          <text x="150" y="388" class="dim">18&prime; &times; 16&prime;</text>
+          <!-- primary bath -->
+          <rect class="rm rm-wet" x="312" y="362" width="160" height="118"/>
+          <text x="392" y="416" class="lbl">PRIMARY BATH</text>
+          <text x="392" y="432" class="dim">14&prime;&times;12&prime;</text>
+          <!-- WIC -->
+          <rect class="rm rm-util" x="42" y="282" width="0" height="0"/>
+          <rect class="rm rm-util" x="222" y="282" width="90" height="80"/>
+          <text x="267" y="318" class="lbl">W.I.C.</text>
+          <text x="267" y="333" class="dim">12&prime;&times;10&prime;</text>
+          <!-- COVERED PORCH (rear, bottom) -->
+          <rect class="rm rm-out" x="472" y="362" width="248" height="118" stroke-dasharray="6 5"/>
+          <text x="596" y="414" class="lbl">COVERED PORCH</text>
+          <text x="596" y="430" class="dim">40&prime; &times; 12&prime; &rarr; pool</text>
+          <!-- doors (arcs) -->
+          <path class="door" d="M312 130 a18 18 0 0 1 18 18"/>
+          <path class="door" d="M532 330 a16 16 0 0 1 16 -16"/>
+          <!-- pool indicator beyond porch -->
+          <text x="596" y="468" class="dim" style="fill:var(--water)">&darr; POOL &amp; SPA BEYOND</text>
+          <!-- dims outer -->
+          <text x="380" y="28" class="dim">76&prime; OVERALL</text>
+          <text x="26" y="260" class="dim" transform="rotate(-90 26 260)">62&prime; DEEP</text>
+          <!-- north -->
+          <g transform="translate(700,500)">
+            <circle r="16" fill="#fbfaf6" stroke="var(--ink)"/>
+            <path d="M0 -11 L5 7 L0 3 L-5 7 Z" fill="var(--clay)"/>
+            <text y="3" class="dim" style="font-weight:700">N</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><i style="background:#efe9da"></i>Living / social</span>
+          <span><i style="background:#e8ece2"></i>Bedrooms</span>
+          <span><i style="background:#dfe8ed"></i>Bath / wet</span>
+          <span><i style="background:#e9e4d6"></i>Utility / storage</span>
+          <span><i style="background:#e4ebe0"></i>Covered outdoor</span>
+          <span><i style="background:#e6e2d6"></i>Garage</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ UPPER FLOOR ============ -->
+  <section class="sheet" id="upper-floor">
+    <div class="sheet-head">
+      <span class="sheet-tag">A-04</span>
+      <h2>Upper Floor Plan</h2>
+    </div>
+    <p class="lede">~1,850 sq ft. Three further bedrooms&mdash;one a full en-suite, two sharing a Jack-and-Jill&mdash;plus a generous bonus / media room over the garage and an open loft overlooking the foyer below. This is the &ldquo;kids and guests&rdquo; floor, fully separable from the main-floor primary suite.</p>
+    <div class="draw">
+      <div class="draw-title"><b>UPPER FLOOR</b> <span>1,850 SF &middot; SCALE 1&Prime;=10&prime; &middot; 3 BED + BONUS</span></div>
+      <div class="draw-body">
+        <svg viewBox="0 0 760 460" role="img" aria-label="Upper floor plan">
+          <rect class="wall" x="40" y="40" width="680" height="380"/>
+          <!-- BONUS / MEDIA over garage -->
+          <rect class="rm rm-live" x="42" y="42" width="220" height="200"/>
+          <text x="152" y="136" class="lbl">BONUS / MEDIA</text>
+          <text x="152" y="152" class="dim">22&prime; &times; 18&prime;</text>
+          <!-- BEDROOM 3 (ensuite) -->
+          <rect class="rm rm-priv" x="42" y="242" width="160" height="178"/>
+          <text x="122" y="324" class="lbl">BEDROOM 3</text>
+          <text x="122" y="340" class="dim">15&prime; &times; 14&prime;</text>
+          <rect class="rm rm-wet" x="202" y="242" width="60" height="90"/>
+          <text x="232" y="290" class="dim">ENSUITE</text>
+          <!-- WIC bed3 -->
+          <rect class="rm rm-util" x="202" y="332" width="60" height="88"/>
+          <text x="232" y="380" class="dim">WIC</text>
+          <!-- LOFT (center, open to below) -->
+          <rect class="rm rm-out" x="262" y="242" width="150" height="120" stroke-dasharray="5 5"/>
+          <text x="337" y="298" class="lbl">LOFT</text>
+          <text x="337" y="314" class="dim">open to foyer</text>
+          <!-- stair down -->
+          <rect class="rm rm-util" x="262" y="362" width="150" height="58"/>
+          <text x="337" y="392" class="dim">stair down &darr;</text>
+          <!-- gallery hall -->
+          <rect class="rm rm-util" x="262" y="150" width="280" height="92"/>
+          <text x="402" y="200" class="dim">GALLERY HALL</text>
+          <!-- BEDROOM 4 -->
+          <rect class="rm rm-priv" x="262" y="42" width="150" height="108"/>
+          <text x="337" y="92" class="lbl">BEDROOM 4</text>
+          <text x="337" y="108" class="dim">14&prime; &times; 13&prime;</text>
+          <!-- Jack & Jill -->
+          <rect class="rm rm-wet" x="412" y="42" width="80" height="108"/>
+          <text x="452" y="92" class="lbl" style="font-size:9px">JACK &amp;</text>
+          <text x="452" y="106" class="lbl" style="font-size:9px">JILL</text>
+          <!-- BEDROOM 5 -->
+          <rect class="rm rm-priv" x="492" y="42" width="160" height="108"/>
+          <text x="572" y="92" class="lbl">BEDROOM 5</text>
+          <text x="572" y="108" class="dim">14&prime; &times; 13&prime;</text>
+          <!-- laundry upper -->
+          <rect class="rm rm-util" x="542" y="150" width="110" height="60"/>
+          <text x="597" y="184" class="lbl" style="font-size:10px">LAUNDRY</text>
+          <!-- linen / storage -->
+          <rect class="rm rm-util" x="412" y="210" width="240" height="210"/>
+          <text x="532" y="312" class="lbl">FLEX / GUEST 6 (opt.)</text>
+          <text x="532" y="328" class="dim">16&prime;&times;16&prime; &middot; or storage</text>
+          <text x="380" y="28" class="dim">76&prime; OVERALL</text>
+          <text x="26" y="240" class="dim" transform="rotate(-90 26 240)">52&prime; DEEP</text>
+          <g transform="translate(700,400)">
+            <circle r="16" fill="#fbfaf6" stroke="var(--ink)"/>
+            <path d="M0 -11 L5 7 L0 3 L-5 7 Z" fill="var(--clay)"/>
+            <text y="3" class="dim" style="font-weight:700">N</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><i style="background:#efe9da"></i>Bonus / media</span>
+          <span><i style="background:#e8ece2"></i>Bedrooms</span>
+          <span><i style="background:#dfe8ed"></i>Bath / wet</span>
+          <span><i style="background:#e9e4d6"></i>Utility / flex</span>
+          <span><i style="background:#e4ebe0"></i>Open loft</span>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b>Flex move:</b> The upper &ldquo;Flex / Guest 6&rdquo; room is the budget lever. Finish it as a 6th bedroom/second office if you want it, or leave it as unconditioned walk-in storage and bank ~$30&ndash;45k. Either way the framing and roof already exist, so adding it later is cheap.</div>
+  </section>
+
+  <!-- ============ COST STUDY ============ -->
+  <section class="sheet" id="cost">
+    <div class="sheet-head">
+      <span class="sheet-tag">A-05</span>
+      <h2>Budget Study by Region</h2>
+    </div>
+    <p class="lede">Same drawings, four locations. Construction cost is the big regional variable; land and property tax swing the lifetime cost. All figures assume the 4,800 sq ft / 6-acre / pool-and-court program above, with a 10% contingency.</p>
+    <div class="two">
+      <div class="draw">
+        <div class="draw-title"><b>UPSTATE SOUTH CAROLINA</b> <span>BEST VALUE</span></div>
+        <div class="draw-body" style="padding:1rem 1.2rem">
+          <table class="cost">
+            <tr><th>Item</th><th>Cost</th></tr>
+            <tr><td>6 acres (nr Greenville)</td><td>$95,000</td></tr>
+            <tr><td>Build 4,800 sf @ $230</td><td>$1,104,000</td></tr>
+            <tr><td>Pool + spa + deck</td><td>$85,000</td></tr>
+            <tr><td>Tennis court</td><td>$38,000</td></tr>
+            <tr><td>Site / well / septic / drive</td><td>$120,000</td></tr>
+            <tr><td>Architect (9%)</td><td>$99,000</td></tr>
+            <tr><td>Contingency 10%</td><td>$115,000</td></tr>
+            <tr class="tot"><td>TOTAL</td><td>$1,656,000</td></tr>
+            <tr><td>Est. property tax / yr</td><td>~$6,500</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="draw">
+        <div class="draw-title"><b>EAST TENNESSEE</b> <span>SCENERY + NO INCOME TAX</span></div>
+        <div class="draw-body" style="padding:1rem 1.2rem">
+          <table class="cost">
+            <tr><th>Item</th><th>Cost</th></tr>
+            <tr><td>6 acres (nr Knoxville)</td><td>$135,000</td></tr>
+            <tr><td>Build 4,800 sf @ $235</td><td>$1,128,000</td></tr>
+            <tr><td>Pool + spa + deck</td><td>$85,000</td></tr>
+            <tr><td>Tennis court</td><td>$38,000</td></tr>
+            <tr><td>Site / well / septic / drive</td><td>$120,000</td></tr>
+            <tr><td>Architect (9%)</td><td>$101,000</td></tr>
+            <tr><td>Contingency 10%</td><td>$121,000</td></tr>
+            <tr class="tot"><td>TOTAL</td><td>$1,728,000</td></tr>
+            <tr><td>Est. property tax / yr</td><td>~$8,500</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="draw">
+        <div class="draw-title"><b>NC FOOTHILLS / PIEDMONT</b> <span>FOUR SEASONS</span></div>
+        <div class="draw-body" style="padding:1rem 1.2rem">
+          <table class="cost">
+            <tr><th>Item</th><th>Cost</th></tr>
+            <tr><td>6 acres (nr Winston-Salem)</td><td>$110,000</td></tr>
+            <tr><td>Build 4,800 sf @ $250</td><td>$1,200,000</td></tr>
+            <tr><td>Pool + spa + deck</td><td>$88,000</td></tr>
+            <tr><td>Tennis court</td><td>$40,000</td></tr>
+            <tr><td>Site / well / septic / drive</td><td>$125,000</td></tr>
+            <tr><td>Architect (9%)</td><td>$108,000</td></tr>
+            <tr><td>Contingency 10%</td><td>$132,000</td></tr>
+            <tr class="tot"><td>TOTAL</td><td>$1,803,000</td></tr>
+            <tr><td>Est. property tax / yr</td><td>~$11,000</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="draw">
+        <div class="draw-title"><b>EAST TEXAS</b> <span>CHEAP BUILD / HIGH TAX</span></div>
+        <div class="draw-body" style="padding:1rem 1.2rem">
+          <table class="cost">
+            <tr><th>Item</th><th>Cost</th></tr>
+            <tr><td>6 acres (nr Tyler)</td><td>$85,000</td></tr>
+            <tr><td>Build 4,800 sf @ $215</td><td>$1,032,000</td></tr>
+            <tr><td>Pool + spa + deck</td><td>$82,000</td></tr>
+            <tr><td>Tennis court</td><td>$36,000</td></tr>
+            <tr><td>Site / well / septic / drive</td><td>$115,000</td></tr>
+            <tr><td>Architect (9%)</td><td>$93,000</td></tr>
+            <tr><td>Contingency 10%</td><td>$104,000</td></tr>
+            <tr class="tot"><td>TOTAL</td><td>$1,547,000</td></tr>
+            <tr><td>Est. property tax / yr</td><td>~$26,000</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b>The headline:</b> Upstate SC lands closest to your $1.6M number while keeping the full program (pool + tennis + 5 beds). East Texas builds cheapest of all&mdash;but the ~$26k/yr property tax is the catch that, over 15 years, costs you ~$300k more than South Carolina. <b>To pull any of these firmly under $1.6M:</b> drop the tennis court (&minus;$38k), finish 4 beds instead of 5 (&minus;$45k), and trim the build to 4,400 sf (&minus;$90k). That trio brings even the NC and TN options comfortably below budget.</div>
+  </section>
+
+  <footer class="wrap">
+    Plan studies &mdash; schematic, dimensioned to scale for early feasibility only. Final design, structural engineering, septic perc tests, and permitting to be confirmed with a licensed local architect and builder. Construction costs reflect 2026 estimates and vary by finish level, site conditions, and contractor.
+  </footer>
+</main>
+<script>'use strict';</script>
+</body>
+</html>
